@@ -16,13 +16,6 @@ const FORMATS = [
   { value: 'story',     label: 'Story',                   points: 1, emoji: '⭕' },
 ];
 
-const PLATFORM_LABELS: Record<string, string> = {
-  instagram: '📸 Instagram',
-  tiktok: '🎵 TikTok',
-  youtube: '▶️ YouTube',
-  linkedin: '💼 LinkedIn',
-  twitter: '🐦 Twitter/X',
-};
 
 interface DetectResult {
   platform: string;

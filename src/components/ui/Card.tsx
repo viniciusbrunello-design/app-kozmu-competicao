@@ -8,6 +8,8 @@ export interface CardProps {
   variant?: 'default' | 'glass' | 'elevated';
   glow?: 'none' | 'lime' | 'purple';
   title?: React.ReactNode;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
+  style?: React.CSSProperties;
 }
 
 export function Card({
@@ -15,10 +17,14 @@ export function Card({
   className,
   variant = 'default',
   glow = 'none',
-  title
+  title,
+  onClick,
+  style,
 }: CardProps) {
   return (
     <div
+      onClick={onClick}
+      style={style}
       className={clsx(
         styles.card,
         variant !== 'default' && styles[variant],

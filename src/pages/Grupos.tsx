@@ -176,7 +176,7 @@ export function Grupos() {
                 <button className={styles.codeBtn} onClick={() => handleShareCode(group)}>
                   {copiedCode === group.id
                     ? <Copy size={12} />
-                    : navigator.share
+                    : 'share' in navigator
                     ? <Share2 size={12} />
                     : <Copy size={12} />}
                   <span>{copiedCode === group.id ? 'Copiado!' : group.inviteCode}</span>

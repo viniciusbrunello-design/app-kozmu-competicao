@@ -133,7 +133,7 @@ export function GrupoDetalhe() {
           <span className={styles.headerSub}>{group.memberCount} membros · {daysLeft}d para reset</span>
         </div>
         <button className={styles.shareBtn} onClick={handleShare} aria-label="Compartilhar convite">
-          {copied ? <Copy size={18} /> : navigator.share ? <Share2 size={18} /> : <Copy size={18} />}
+          {copied ? <Copy size={18} /> : 'share' in navigator ? <Share2 size={18} /> : <Copy size={18} />}
         </button>
       </header>
 
