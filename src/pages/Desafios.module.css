@@ -1,0 +1,140 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionTitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  gap: 4px;
+}
+
+.challengeCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.challengeHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.challengeInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.challengeMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.challengeType {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--accent-purple);
+  background: rgba(139, 92, 246, 0.15);
+  border-radius: 6px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.daysLeft {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.expired {
+  font-size: 0.7rem;
+  color: var(--status-error);
+}
+
+.challengeTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.challengeDesc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.completedIcon {
+  color: var(--accent-lime);
+  flex-shrink: 0;
+}
+
+.progressSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progressLabel {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.progressValue {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.challengeFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.participantCount {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.completedLabel {
+  font-size: 0.75rem;
+  color: var(--accent-lime);
+  font-weight: 600;
+}

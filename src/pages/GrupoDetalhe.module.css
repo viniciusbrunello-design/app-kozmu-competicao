@@ -1,0 +1,311 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  background: var(--bg-base);
+  z-index: 10;
+}
+
+.back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.back:hover { background: var(--bg-surface); }
+
+.headerInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.headerTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.headerSub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.shareBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.shareBtn:hover {
+  color: var(--accent-lime);
+  border-color: var(--accent-lime);
+}
+
+.copiedToast {
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--accent-lime);
+  background: rgba(163, 230, 53, 0.12);
+  padding: 6px;
+}
+
+/* My position card */
+.myCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.myCardLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.myCardContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.myRank {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--accent-purple);
+}
+
+.myStats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.myPoints {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.myStreak {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--status-warning, #f59e0b);
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-radius: 10px;
+  background: var(--bg-surface);
+  padding: 4px;
+}
+
+.tab {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tabActive {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* Ranking rows */
+.rankRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.rankRow:last-child { border-bottom: none; }
+
+.rankRowMe {
+  background: rgba(163, 230, 53, 0.05);
+  border-radius: 8px;
+  padding: 12px 8px;
+  margin: 0 -8px;
+}
+
+.rankPos {
+  font-size: 1rem;
+  width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.rankInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rankName {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.youBadge {
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 99px;
+  background: rgba(163, 230, 53, 0.2);
+  color: var(--accent-lime);
+}
+
+.rankLeague {
+  font-size: 0.75rem;
+}
+
+.rankRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.rankPoints {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--accent-lime);
+}
+
+.nudgeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.nudgeBtn:hover:not(:disabled) {
+  color: var(--accent-blue);
+  border-color: var(--accent-blue);
+  background: rgba(99, 179, 237, 0.1);
+}
+
+.nudgeBtn.nudgeDone {
+  color: var(--accent-lime);
+  border-color: var(--accent-lime);
+  background: rgba(163, 230, 53, 0.1);
+  cursor: default;
+}
+
+/* Activity rows */
+.activityRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.activityRow:last-child { border-bottom: none; }
+
+.activityInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.activityName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.activityAction {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.activityTime {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.empty {
+  padding: 24px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+/* Skeleton */
+.skeletonTitle {
+  height: 18px;
+  width: 140px;
+  border-radius: 6px;
+  background: var(--bg-surface);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.skeletonBlock {
+  height: 80px;
+  border-radius: 12px;
+  background: var(--bg-surface);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}

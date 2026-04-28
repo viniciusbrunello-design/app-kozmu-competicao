@@ -1,0 +1,53 @@
+.avatarContainer {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: var(--bg-surface-elevated);
+}
+
+.sm .avatar { width: 32px; height: 32px; }
+.md .avatar { width: 48px; height: 48px; }
+.lg .avatar { width: 80px; height: 80px; }
+.xl .avatar { width: 120px; height: 120px; }
+
+/* Status rings */
+.ring {
+  padding: 3px;
+  background: var(--bg-base);
+}
+
+.ringActive {
+  background: linear-gradient(135deg, var(--accent-lime), #10B981);
+  padding: 3px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--accent-lime-glow);
+}
+
+.ringDanger {
+  background: linear-gradient(135deg, var(--status-error), #F43F5E);
+  padding: 3px;
+  border-radius: 50%;
+}
+
+.initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  font-weight: 600;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--bg-surface-elevated), var(--bg-surface));
+  border: 1px solid var(--border-color);
+}
+
+.sm .initials { width: 32px; height: 32px; font-size: 0.75rem; }
+.md .initials { width: 48px; height: 48px; font-size: 1rem; }
+.lg .initials { width: 80px; height: 80px; font-size: 1.5rem; }
+.xl .initials { width: 120px; height: 120px; font-size: 2.5rem; }

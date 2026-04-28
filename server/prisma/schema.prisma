@@ -1,0 +1,189 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  username     String   @unique
+  passwordHash String?
+  displayName  String
+  bio          String?
+  profileType  String   @default("creator")
+  avatarUrl    String?
+  platforms    String   @default("[]")
+  totalPoints  Int      @default(0)
+  league       String   @default("bronze")
+  winCount     Int      @default(0)
+  isPro        Boolean  @default(false)
+  refreshToken String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  streak                Streak?
+  groupMemberships      GroupMember[]
+  submissions           Submission[]
+  notifications         Notification[]
+  activities            Activity[]
+  challengeParticipants ChallengeParticipant[]
+  invitesSent           GroupInvite[]          @relation("InviteSender")
+}
+
+model Streak {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  currentStreak   Int       @default(0)
+  bestStreak      Int       @default(0)
+  lastCheckIn     DateTime?
+  weeklyCount     Int       @default(0)
+  weeklyTarget    Int       @default(5)
+  weekStart       DateTime?
+  catchUpTokens   Int       @default(1)
+  updatedAt       DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Group {
+  id                String   @id @default(cuid())
+  name              String
+  description       String?
+  inviteCode        String   @unique
+  avatarUrl         String?
+  type              String   @default("private")
+  cycleDuration     String   @default("weekly")
+  maxMembers        Int      @default(20)
+  isActive          Boolean  @default(true)
+  currentCycleStart DateTime @default(now())
+  currentCycleEnd   DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  members      GroupMember[]
+  challenges   Challenge[]
+  activities   Activity[]
+  invites      GroupInvite[]
+  scoringRules GroupScoringRule[]
+  submissions  Submission[]
+}
+
+model GroupMember {
+  id         String   @id @default(cuid())
+  userId     String
+  groupId    String
+  role       String   @default("member")
+  cyclePoints Int     @default(0)
+  totalPoints Int     @default(0)
+  joinedAt   DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId])
+}
+
+model GroupScoringRule {
+  id      String @id @default(cuid())
+  groupId String
+  format  String
+  points  Int
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, format])
+}
+
+model Challenge {
+  id          String   @id @default(cuid())
+  groupId     String?
+  title       String
+  description String
+  type        String   @default("consistency")
+  targetCount Int      @default(5)
+  targetDays  Int?
+  format      String?
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  group        Group?                 @relation(fields: [groupId], references: [id])
+  participants ChallengeParticipant[]
+}
+
+model ChallengeParticipant {
+  id          String   @id @default(cuid())
+  challengeId String
+  userId      String
+  progress    Int      @default(0)
+  completed   Boolean  @default(false)
+  joinedAt    DateTime @default(now())
+
+  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([challengeId, userId])
+}
+
+model Submission {
+  id              String    @id @default(cuid())
+  userId          String
+  groupId         String?
+  url             String
+  format          String
+  screenshotUrl   String?
+  points          Int       @default(0)
+  status          String    @default("pending")
+  platform        String?
+  validatedAt     DateTime?
+  validatedBy     String?
+  rejectionReason String?
+  createdAt       DateTime  @default(now())
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group? @relation(fields: [groupId], references: [id])
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  userId    String
+  groupId   String?
+  type      String
+  data      String   @default("{}")
+  createdAt DateTime @default(now())
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group? @relation(fields: [groupId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  body      String
+  data      String   @default("{}")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GroupInvite {
+  id        String   @id @default(cuid())
+  groupId   String
+  senderId  String
+  email     String?
+  token     String   @unique
+  used      Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  group  Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  sender User  @relation("InviteSender", fields: [senderId], references: [id], onDelete: Cascade)
+}

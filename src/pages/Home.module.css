@@ -1,0 +1,335 @@
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.welcome {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.greeting {
+  display: flex;
+  flex-direction: column;
+}
+
+.greeting span {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.greeting h2 {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+
+.streakCard {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px 20px;
+}
+
+.streakTitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.streakValue {
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--accent-lime);
+  text-shadow: 0 0 20px var(--accent-lime-glow);
+  margin-bottom: 8px;
+}
+
+.streakSub {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.fireIcon {
+  color: var(--accent-lime);
+  filter: drop-shadow(0 0 10px var(--accent-lime-glow));
+  margin-bottom: 12px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.seeAll {
+  font-size: 0.875rem;
+  color: var(--accent-blue);
+}
+
+.activityItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.activityItem:last-child {
+  border-bottom: none;
+}
+
+.activityContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.activityUser {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+}
+
+.activityAction {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.activityRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.activityTime {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.nudgeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.nudgeBtn:hover:not(:disabled) {
+  color: var(--accent-blue);
+  border-color: var(--accent-blue);
+  background: rgba(99, 179, 237, 0.1);
+}
+
+.nudgeBtn.nudgeDone {
+  color: var(--accent-lime);
+  border-color: var(--accent-lime);
+  background: rgba(163, 230, 53, 0.1);
+  cursor: default;
+}
+
+/* Cycle end modal */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 100;
+  padding: 0 0 env(safe-area-inset-bottom, 0);
+}
+
+.cycleModal {
+  background: var(--bg-surface);
+  border-radius: 24px 24px 0 0;
+  padding: 32px 24px 40px;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.cycleModalHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.cycleModalTrophy {
+  color: #ffd700;
+  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.5));
+}
+
+.cycleModalTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.cycleModalGroup {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.cyclePodium {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.cyclePodiumItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.cyclePodiumFirst {
+  transform: translateY(-8px);
+}
+
+.cycleMedal {
+  font-size: 1.25rem;
+}
+
+.cyclePodiumName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cyclePodiumPts {
+  font-size: 0.6875rem;
+  color: var(--accent-lime);
+  font-weight: 700;
+}
+
+.cycleMyResult {
+  text-align: center;
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  background: var(--bg-base);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.shieldBadge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  padding: 4px 12px;
+  border-radius: 99px;
+  background: rgba(99, 179, 237, 0.15);
+  border: 1px solid rgba(99, 179, 237, 0.3);
+  color: var(--accent-blue);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.missionBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--accent-purple);
+  background: rgba(139, 92, 246, 0.15);
+  border-radius: 8px;
+  padding: 3px 8px;
+}
+
+.missionCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: filter 0.15s;
+}
+
+.missionCard:hover {
+  filter: brightness(1.08);
+}
+
+.missionEmoji {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.missionContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.missionTitle {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.missionDesc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.missionArrow {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.ctaSection {
+  margin: -4px 0;
+}
+
+.rankBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent-purple);
+  background: rgba(139, 92, 246, 0.15);
+  border-radius: 8px;
+  padding: 3px 8px;
+}
+
+.emptyFeed {
+  padding: 16px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}

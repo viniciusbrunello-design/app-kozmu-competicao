@@ -1,0 +1,19 @@
+{
+  "name": "Kozmu — Competição de Criadores",
+  "short_name": "Kozmu",
+  "description": "Plataforma gamificada de consistência para criadores de conteúdo.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "social", "lifestyle"]
+}
