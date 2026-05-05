@@ -91,6 +91,7 @@ export function Home() {
   const [loadingFeed, setLoadingFeed] = useState(true);
   const [nudgedIds, setNudgedIds] = useState<Set<string>>(new Set());
   const [cycleModal, setCycleModal] = useState<CycleResult | null>(null);
+  const [heatmap, setHeatmap] = useState<{ date: string; count: number }[]>([]);
 
   useEffect(() => {
     Promise.all([
@@ -100,6 +101,7 @@ export function Home() {
         .get<{ notifications: unknown[]; unreadCount: number }>('/notifications?unread=true')
         .then((r) => setUnreadCount(r.unreadCount))
         .catch(() => {}),
+      api.get<{ date: string; count: number }[]>('/users/me/heatmap').then(setHeatmap).catch(() => {}),
     ]).finally(() => setLoadingFeed(false));
 
     checkEndedCycles();
@@ -138,6 +140,31 @@ export function Home() {
   const weeklyProgress = Math.min(100, Math.round((weeklyCount / weeklyTarget) * 100));
   const shields = (streak as { catchUpTokens?: number } | undefined)?.catchUpTokens ?? 0;
   const dailyMission = getDailyMission();
+  const currentStreak = streak?.currentStreak ?? 0;
+
+  // Heatmap-derived metrics
+  const last7Days = heatmap.slice(-7);
+  const last30Days = heatmap.slice(-30);
+  const activeDays = heatmap.filter((d) => d.count > 0).length;
+  const consistency = last30Days.length
+    ? Math.round((last30Days.filter((d) => d.count > 0).length / last30Days.length) * 100)
+    : 0;
+  const totalPosts = user?.stats?.submissionCount ?? 0;
+
+  // Show comeback nudge if 3+ days with no posts and no active streak
+  const last3Empty = heatmap.length >= 3 && heatmap.slice(-3).every((d) => d.count === 0);
+  const showComeback = last3Empty && currentStreak === 0 && heatmap.length > 0;
+
+  // Milestone messages
+  const MILESTONES: Record<number, string> = {
+    7: '🎉 7 dias consecutivos! Uma semana de constância!',
+    14: '🔥 14 dias! Duas semanas sem parar — incrível!',
+    21: '⚡ 21 dias! Você criou um hábito de verdade!',
+    30: '🚀 30 dias! Um mês de consistência. Lendário!',
+    60: '💎 60 dias! Você é uma máquina de conteúdo!',
+    100: '🌌 100 dias!! Você está em órbita, criador(a)!',
+  };
+  const milestoneMsg = MILESTONES[currentStreak] ?? null;
 
   return (
     <>
@@ -155,20 +182,50 @@ export function Home() {
             <Avatar alt={user?.displayName ?? ''} size="md" status={streak?.atRisk ? 'danger' : 'active'} />
           </div>
 
+          {/* Comeback nudge */}
+          {showComeback && (
+            <div className={styles.comebackBanner}>
+              👋 Faz alguns dias que você não publica. Volte à órbita — seu público está esperando!
+            </div>
+          )}
+
+          {/* Milestone banner */}
+          {milestoneMsg && !showComeback && (
+            <div className={styles.milestoneBanner}>{milestoneMsg}</div>
+          )}
+
           {/* Streak card */}
           <Card variant="glass" glow="lime" className={styles.streakCard}>
             <Flame size={48} className={styles.fireIcon} />
             <div className={styles.streakTitle}>Streak Atual</div>
-            <div className={styles.streakValue}>{streak?.currentStreak ?? 0}</div>
+            <div className={styles.streakValue}>{currentStreak}</div>
             <div className={styles.streakSub}>
               {streak?.atRisk
                 ? '⚠️ Publique hoje para não perder o streak!'
-                : streak && streak.currentStreak > 0
-                ? streak.currentStreak >= 7
-                  ? `${streak.currentStreak} dias — você é imparável! 🚀`
-                  : 'Dias consecutivos publicando!'
+                : currentStreak >= 30
+                ? 'dias — lendário! 🌌'
+                : currentStreak >= 7
+                ? 'dias consecutivos — continue assim! 🔥'
+                : currentStreak > 0
+                ? 'dias consecutivos publicando!'
                 : 'Publique agora para iniciar seu streak!'}
             </div>
+
+            {/* Last 7 days dots */}
+            {last7Days.length > 0 && (
+              <div className={styles.weekDots}>
+                {last7Days.map(({ date, count }) => {
+                  const day = new Date(date + 'T12:00:00').getDate();
+                  return (
+                    <div key={date} className={styles.dayDot}>
+                      <div className={`${styles.dot} ${count > 0 ? styles.dotActive : ''}`} />
+                      <span className={styles.dayNum}>{day}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
             {shields > 0 && (
               <div className={styles.shieldBadge}>
                 <Shield size={13} />
@@ -176,6 +233,26 @@ export function Home() {
               </div>
             )}
           </Card>
+
+          {/* Stats row */}
+          <div className={styles.statsRow}>
+            <div className={styles.statItem}>
+              <span className={styles.statNum}>{totalPosts}</span>
+              <span className={styles.statLabel}>Check-ins</span>
+            </div>
+            <div className={styles.statDivider} />
+            <div className={styles.statItem}>
+              <span className={styles.statNum}>{activeDays}</span>
+              <span className={styles.statLabel}>Dias ativos</span>
+            </div>
+            <div className={styles.statDivider} />
+            <div className={styles.statItem}>
+              <span className={styles.statNum} style={{ color: consistency >= 70 ? 'var(--accent-lime)' : consistency >= 40 ? 'var(--accent-blue)' : 'var(--text-primary)' }}>
+                {consistency}%
+              </span>
+              <span className={styles.statLabel}>Constância</span>
+            </div>
+          </div>
 
           {/* Weekly goal */}
           <div className={styles.section}>
