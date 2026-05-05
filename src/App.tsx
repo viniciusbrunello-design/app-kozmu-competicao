@@ -16,6 +16,7 @@ import { Onboarding } from './pages/Onboarding';
 import { Notificacoes } from './pages/Notificacoes';
 import { Historico } from './pages/Historico';
 import { GrupoDetalhe } from './pages/GrupoDetalhe';
+import { Configuracoes } from './pages/Configuracoes';
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -167,6 +168,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Notificacoes />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/configuracoes"
+        element={
+          <ProtectedRoute>
+            <Configuracoes />
           </ProtectedRoute>
         }
       />

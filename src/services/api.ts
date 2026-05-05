@@ -28,17 +28,19 @@ async function refreshAccessToken(): Promise<string | null> {
       body: JSON.stringify({ refreshToken: refresh }),
     });
 
-    if (!res.ok) {
+    // Only clear tokens on definitive auth rejection — not on server/network errors
+    if (res.status === 401 || res.status === 403) {
       clearTokens();
       return null;
     }
+
+    if (!res.ok) return null; // Server sleeping or network issue — keep tokens
 
     const { data } = await res.json();
     setTokens(data.accessToken, data.refreshToken);
     return data.accessToken;
   } catch {
-    clearTokens();
-    return null;
+    return null; // Network error — keep tokens, don't force logout
   }
 }
 
@@ -63,8 +65,12 @@ async function request<T>(
     if (newToken) {
       return request<T>(path, options, false);
     }
-    // Trigger logout
-    window.dispatchEvent(new CustomEvent('kozmu:logout'));
+    // Only logout if tokens were actually cleared (real auth failure)
+    const { refresh } = getTokens();
+    if (!refresh) {
+      window.dispatchEvent(new CustomEvent('kozmu:logout'));
+      throw new Error('Sessão expirada. Faça login novamente.');
+    }
     throw new Error('Sessão expirada. Faça login novamente.');
   }
 

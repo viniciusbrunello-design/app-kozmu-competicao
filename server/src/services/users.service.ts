@@ -44,12 +44,20 @@ export async function getUserProfile(userId: string) {
 
 export async function updateUserProfile(
   userId: string,
-  data: { displayName?: string; bio?: string; profileType?: string; platforms?: string[] },
+  data: { displayName?: string; username?: string; bio?: string; profileType?: string; platforms?: string[] },
 ) {
+  if (data.username) {
+    const existing = await prisma.user.findUnique({ where: { username: data.username } });
+    if (existing && existing.id !== userId) {
+      throw new Error('Este username já está em uso.');
+    }
+  }
+
   const updated = await prisma.user.update({
     where: { id: userId },
     data: {
       ...(data.displayName && { displayName: data.displayName }),
+      ...(data.username && { username: data.username }),
       ...(data.bio !== undefined && { bio: data.bio }),
       ...(data.profileType && { profileType: data.profileType }),
       ...(data.platforms && { platforms: JSON.stringify(data.platforms) }),

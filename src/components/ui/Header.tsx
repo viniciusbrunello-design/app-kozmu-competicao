@@ -33,7 +33,7 @@ export function Header({
           </button>
         )}
         {showSettings && (
-          <button className={styles.actionBtn} aria-label="Configurações">
+          <button className={styles.actionBtn} aria-label="Configurações" onClick={() => navigate('/configuracoes')}>
             <Settings size={20} />
           </button>
         )}
