@@ -52,20 +52,25 @@ export function GrupoDetalhe() {
   const [ranking, setRanking] = useState<RankingEntry[]>([]);
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [nudgedIds, setNudgedIds] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState(false);
   const [tab, setTab] = useState<'ranking' | 'atividade'>('ranking');
 
-  useEffect(() => {
+  const load = useCallback(() => {
     if (!id) return;
+    setLoading(true);
+    setLoadError(false);
     Promise.all([
       getGroupDetails(id).then(setGroup),
       getGroupRanking(id, 'weekly').then(setRanking),
       getGroupActivity(id).then(setActivity),
     ])
-      .catch(() => {})
+      .catch(() => setLoadError(true))
       .finally(() => setLoading(false));
   }, [id]);
+
+  useEffect(() => { load(); }, [load]);
 
   const handleNudge = useCallback(async (targetUserId: string) => {
     if (!id) return;
@@ -106,13 +111,28 @@ export function GrupoDetalhe() {
     );
   }
 
-  if (!group) {
+  if (loadError || (!loading && !group)) {
     return (
       <div className="mobile-container">
         <header className={styles.header}>
           <button className={styles.back} onClick={() => navigate(-1)}><ArrowLeft size={20} /></button>
-          <span className={styles.headerTitle}>Grupo não encontrado</span>
+          <span className={styles.headerTitle}>Erro ao carregar</span>
         </header>
+        <div className="page-content" style={{ textAlign: 'center', paddingTop: 40 }}>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: 16 }}>
+            Não foi possível carregar o grupo.
+          </p>
+          <button
+            onClick={load}
+            style={{
+              background: 'none', border: '1px solid var(--accent-purple)',
+              color: 'var(--accent-purple)', borderRadius: 10, padding: '8px 20px',
+              fontFamily: 'inherit', fontSize: '0.875rem', cursor: 'pointer',
+            }}
+          >
+            Tentar novamente
+          </button>
+        </div>
       </div>
     );
   }

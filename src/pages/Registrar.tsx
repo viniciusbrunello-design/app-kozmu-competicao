@@ -132,10 +132,6 @@ export function Registrar() {
                 type="url"
                 value={url}
                 onChange={(e) => handleUrlChange(e.target.value)}
-                onPaste={(e) => {
-                  const pasted = e.clipboardData.getData('text');
-                  handleUrlChange(pasted);
-                }}
                 placeholder="https://instagram.com/reel/..."
                 required
                 className={styles.input}

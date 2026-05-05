@@ -23,9 +23,19 @@ export function Grupos() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState(false);
+
+  function fetchGroups() {
+    setLoading(true);
+    setFetchError(false);
+    groupsService.getMyGroups()
+      .then(setGroups)
+      .catch(() => setFetchError(true))
+      .finally(() => setLoading(false));
+  }
 
   useEffect(() => {
-    groupsService.getMyGroups().then(setGroups).catch(console.error).finally(() => setLoading(false));
+    fetchGroups();
   }, []);
 
   async function handleCreate(e: { preventDefault(): void }) {
@@ -98,7 +108,16 @@ export function Grupos() {
 
           {loading && <div className={styles.empty}>Carregando grupos...</div>}
 
-          {!loading && groups.length === 0 && (
+          {!loading && fetchError && (
+            <Card variant="glass">
+              <div className={styles.empty}>
+                <p>Não foi possível carregar os grupos.</p>
+                <button className={styles.retryBtn} onClick={fetchGroups}>Tentar novamente</button>
+              </div>
+            </Card>
+          )}
+
+          {!loading && !fetchError && groups.length === 0 && (
             <Card variant="glass">
               <div className={styles.empty}>
                 <Users size={40} style={{ color: 'var(--text-muted)', marginBottom: 12 }} />
