@@ -147,6 +147,52 @@ export async function getGroupDetails(groupId: string, userId?: string) {
   };
 }
 
+export async function getPublicGroups(userId: string) {
+  const groups = await prisma.group.findMany({
+    where: { type: 'public', isActive: true },
+    include: { _count: { select: { members: true } } },
+    orderBy: { createdAt: 'desc' },
+    take: 30,
+  });
+
+  const myMemberships = await prisma.groupMember.findMany({
+    where: { userId, groupId: { in: groups.map((g) => g.id) } },
+    select: { groupId: true },
+  });
+  const myGroupIds = new Set(myMemberships.map((m) => m.groupId));
+
+  return groups.map((g) => ({
+    id: g.id,
+    name: g.name,
+    description: g.description,
+    type: g.type,
+    cycleDuration: g.cycleDuration,
+    maxMembers: g.maxMembers,
+    memberCount: g._count.members,
+    isMember: myGroupIds.has(g.id),
+  }));
+}
+
+export async function joinPublicGroup(userId: string, groupId: string) {
+  const group = await prisma.group.findUnique({
+    where: { id: groupId },
+    include: { members: true },
+  });
+
+  if (!group) throw new NotFoundError('Grupo');
+  if (group.type !== 'public') throw new ForbiddenError('Este grupo é privado');
+
+  const existing = group.members.find((m) => m.userId === userId);
+  if (existing) throw new ConflictError('Você já é membro deste grupo');
+
+  if (group.members.length >= group.maxMembers) throw new ConflictError('Grupo cheio');
+
+  await prisma.groupMember.create({ data: { userId, groupId: group.id } });
+  await createActivity(userId, 'group_joined', { groupName: group.name }, group.id);
+
+  return getGroupDetails(group.id, userId);
+}
+
 export async function generateInviteLink(groupId: string, userId: string): Promise<string> {
   const membership = await prisma.groupMember.findUnique({
     where: { userId_groupId: { userId, groupId } },

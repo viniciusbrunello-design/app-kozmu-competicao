@@ -228,6 +228,130 @@
   background: rgba(239, 68, 68, 0.1);
 }
 
+/* Tabs */
+.tabBar {
+  display: flex;
+  gap: 0;
+  border-radius: 10px;
+  background: var(--bg-surface);
+  padding: 4px;
+}
+
+.tabBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tabBtnActive {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* Public groups */
+.publicCard {
+  display: flex;
+  flex-direction: column;
+}
+
+.publicCardRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.publicCardInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.publicMeta {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.publicMetaItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.joinPublicBtn {
+  background: var(--accent-purple);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 18px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+
+.joinPublicBtn:hover:not(:disabled) { opacity: 0.85; }
+.joinPublicBtn:disabled { opacity: 0.5; cursor: default; }
+
+.joinedBtn {
+  background: rgba(163, 230, 53, 0.15);
+  color: var(--accent-lime);
+  border: 1px solid rgba(163, 230, 53, 0.3);
+  border-radius: 20px;
+  padding: 8px 18px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Create modal additions */
+.typeGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.typeChip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.typeActive {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+  font-weight: 600;
+}
+
 /* Modal */
 .overlay {
   position: fixed;

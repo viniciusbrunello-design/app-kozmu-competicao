@@ -246,6 +246,241 @@
   cursor: default;
 }
 
+/* Check-in CTA */
+.checkInCta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  border: 1.5px dashed rgba(139, 92, 246, 0.4);
+  border-radius: 14px;
+  background: rgba(139, 92, 246, 0.06);
+  color: var(--accent-purple);
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.checkInCta:hover {
+  background: rgba(139, 92, 246, 0.12);
+  border-color: var(--accent-purple);
+}
+
+/* Gymrats-style activity feed */
+.activityFeed {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.postCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.postCardTop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.postCardMeta {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.postCardName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.postCardTime {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.postCardBody {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.postFormatBadge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-purple);
+  background: rgba(139, 92, 246, 0.12);
+  border-radius: 8px;
+  padding: 4px 10px;
+}
+
+.postPoints {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-lime);
+}
+
+.postLink {
+  font-size: 0.75rem;
+  color: var(--accent-blue);
+  text-decoration: none;
+  word-break: break-all;
+  opacity: 0.85;
+}
+
+.postLink:hover { opacity: 1; text-decoration: underline; }
+
+/* Check-in modal */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 100;
+}
+
+.ciModal {
+  background: var(--bg-surface);
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px 40px;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ciModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ciModalTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.ciCloseBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.ciForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ciField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ciLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ciInput {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.ciInput:focus { border-color: var(--accent-purple); }
+
+.ciDetected {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--accent-lime);
+  background: rgba(163, 230, 53, 0.1);
+  border-radius: 8px;
+  padding: 4px 10px;
+}
+
+.ciFormatGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ciFormatBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.ciFormatActive {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+  font-weight: 600;
+}
+
+.ciError {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: var(--status-error);
+  font-size: 0.875rem;
+}
+
+.ciSuccess {
+  text-align: center;
+  padding: 24px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-lime);
+}
+
 /* Activity rows */
 .activityRow {
   display: flex;

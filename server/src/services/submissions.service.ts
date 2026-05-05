@@ -51,7 +51,7 @@ export async function createSubmission(userId: string, input: CreateSubmissionIn
   await createActivity(
     userId,
     'post_submitted',
-    { format: input.format, points, submissionId: submission.id },
+    { format: input.format, platform: input.platform, url: input.url, points, submissionId: submission.id },
     input.groupId,
   );
 
@@ -95,6 +95,8 @@ export async function validateSubmission(
     'post_validated',
     {
       format: submission.format,
+      platform: submission.platform,
+      url: submission.url,
       points: submission.points,
       streakExtended: streakResult.extended,
       currentStreak: streakResult.currentStreak,

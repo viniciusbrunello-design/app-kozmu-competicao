@@ -41,8 +41,27 @@ export interface ScoringRule {
   points: number;
 }
 
+export interface PublicGroup {
+  id: string;
+  name: string;
+  description?: string;
+  type: string;
+  cycleDuration: string;
+  maxMembers: number;
+  memberCount: number;
+  isMember: boolean;
+}
+
 export async function getMyGroups(): Promise<Group[]> {
   return api.get<Group[]>('/groups');
+}
+
+export async function getPublicGroups(): Promise<PublicGroup[]> {
+  return api.get<PublicGroup[]>('/groups/public');
+}
+
+export async function joinPublicGroup(groupId: string): Promise<Group> {
+  return api.post<Group>(`/groups/${groupId}/join-public`);
 }
 
 export async function getGroupDetails(groupId: string): Promise<Group> {

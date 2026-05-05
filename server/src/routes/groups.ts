@@ -29,6 +29,15 @@ router.post('/', validate(createGroupSchema), async (req: AuthRequest, res: Resp
   }
 });
 
+router.get('/public', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const groups = await groupsService.getPublicGroups(req.userId!);
+    res.json({ success: true, data: groups });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post('/join', validate(joinGroupSchema), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const group = await groupsService.joinGroup(req.userId!, req.body);
@@ -64,6 +73,15 @@ router.post('/:id/leave', async (req: AuthRequest, res: Response, next: NextFunc
   try {
     await groupsService.leaveGroup(req.userId!, req.params.id);
     res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/:id/join-public', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const group = await groupsService.joinPublicGroup(req.userId!, req.params.id);
+    res.json({ success: true, data: group });
   } catch (err) {
     next(err);
   }
