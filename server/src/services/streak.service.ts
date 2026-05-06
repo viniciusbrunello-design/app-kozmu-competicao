@@ -59,6 +59,7 @@ export async function processCheckIn(userId: string): Promise<{
   shieldUsed: boolean;
   currentStreak: number;
   weeklyCount: number;
+  newRecord: boolean;
 }> {
   await ensureStreak(userId);
 
@@ -79,7 +80,7 @@ export async function processCheckIn(userId: string): Promise<{
 
     if (isSameLocalDay(last, now)) {
       // Already checked in today — no change
-      return { extended: false, reset: false, shieldUsed: false, currentStreak, weeklyCount: streak.weeklyCount };
+      return { extended: false, reset: false, shieldUsed: false, currentStreak, weeklyCount: streak.weeklyCount, newRecord: false };
     }
 
     if (isLocalYesterday(last, now)) {
@@ -102,6 +103,7 @@ export async function processCheckIn(userId: string): Promise<{
     extended = true;
   }
 
+  const newRecord = currentStreak > streak.bestStreak;
   const bestStreak = Math.max(streak.bestStreak, currentStreak);
 
   // Reset weekly count if we crossed into a new local week
@@ -128,7 +130,7 @@ export async function processCheckIn(userId: string): Promise<{
     },
   });
 
-  return { extended, reset, shieldUsed, currentStreak, weeklyCount };
+  return { extended, reset, shieldUsed, currentStreak, weeklyCount, newRecord };
 }
 
 export async function getStreakStatus(userId: string): Promise<{

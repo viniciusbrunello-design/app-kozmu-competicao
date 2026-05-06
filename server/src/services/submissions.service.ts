@@ -56,9 +56,9 @@ export async function createSubmission(userId: string, input: CreateSubmissionIn
   );
 
   // Auto-validate for MVP (no manual review required by default)
-  await validateSubmission(submission.id, userId, 'auto');
+  const { newRecord } = await validateSubmission(submission.id, userId, 'auto');
 
-  return submission;
+  return { ...submission, newRecord };
 }
 
 export async function validateSubmission(
@@ -69,7 +69,7 @@ export async function validateSubmission(
   const submission = await prisma.submission.findUnique({ where: { id: submissionId } });
   if (!submission) throw new NotFoundError('Submissão');
 
-  if (submission.status !== 'pending') return submission;
+  if (submission.status !== 'pending') return { submission, newRecord: false };
 
   await prisma.submission.update({
     where: { id: submissionId },
@@ -121,6 +121,16 @@ export async function validateSubmission(
         { streak: streakResult.currentStreak },
       );
     }
+
+    if (streakResult.newRecord && streakResult.currentStreak > 1) {
+      await createNotification(
+        submission.userId,
+        'streak_record',
+        `🏆 Novo recorde pessoal!`,
+        `${streakResult.currentStreak} dias consecutivos — você superou seu melhor registro!`,
+        { streak: streakResult.currentStreak },
+      );
+    }
   }
 
   await createNotification(
@@ -131,7 +141,7 @@ export async function validateSubmission(
     { points: submission.points, format: submission.format },
   );
 
-  return submission;
+  return { submission, newRecord: streakResult.newRecord };
 }
 
 export async function rejectSubmission(

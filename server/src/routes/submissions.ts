@@ -29,7 +29,7 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
 
 router.post('/:id/validate', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const submission = await submissionsService.validateSubmission(req.params.id, req.userId!, 'moderator');
+    const { submission } = await submissionsService.validateSubmission(req.params.id, req.userId!, 'moderator');
     res.json({ success: true, data: submission });
   } catch (err) {
     next(err);

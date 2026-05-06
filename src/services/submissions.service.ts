@@ -10,6 +10,7 @@ export interface Submission {
   status: 'pending' | 'validated' | 'rejected';
   createdAt: string;
   validatedAt?: string;
+  newRecord?: boolean;
 }
 
 export async function createSubmission(data: {

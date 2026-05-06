@@ -110,6 +110,17 @@ export async function getUserHeatmap(userId: string): Promise<{ date: string; co
   return result;
 }
 
+export async function getFormatStats(userId: string): Promise<{ format: string; count: number }[]> {
+  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const grouped = await prisma.submission.groupBy({
+    by: ['format'],
+    where: { userId, status: 'validated', createdAt: { gte: since } },
+    _count: { format: true },
+    orderBy: { _count: { format: 'desc' } },
+  });
+  return grouped.map((g) => ({ format: g.format, count: g._count.format }));
+}
+
 export async function getPublicProfile(username: string) {
   const user = await prisma.user.findUnique({
     where: { username },

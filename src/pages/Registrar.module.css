@@ -94,6 +94,16 @@
   background: rgba(139, 92, 246, 0.1);
 }
 
+.formatBlocked {
+  opacity: 0.35;
+  cursor: not-allowed !important;
+}
+
+.formatBlocked .formatPoints {
+  color: var(--text-muted);
+  font-size: 0.65rem;
+}
+
 .formatEmoji {
   font-size: 1.4rem;
 }
@@ -130,6 +140,53 @@
   font-size: 1.4rem;
   font-weight: 800;
   color: var(--accent-lime);
+}
+
+/* Group selection */
+.groupChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.groupChip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.groupChip:hover {
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+}
+
+.groupChipActive {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+  font-weight: 700;
+}
+
+/* Record banner on success */
+.newRecordBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 215, 0, 0.15);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  border-radius: 14px;
+  padding: 12px 20px;
+  color: #ffd700;
+  font-size: 1rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .successScreen {

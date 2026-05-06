@@ -82,6 +82,13 @@ interface CycleResult {
 
 const RANK_MEDAL: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
 
+const FORMAT_EMOJI: Record<string, string> = {
+  reel: '🎬', carousel: '🖼️', feed: '📷', live: '🔴', linkedin: '💼', story: '⭕',
+};
+const FORMAT_LABEL: Record<string, string> = {
+  reel: 'Reels', carousel: 'Carrosseis', feed: 'Posts', live: 'Lives', linkedin: 'LinkedIn', story: 'Stories',
+};
+
 export function Home() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -92,6 +99,7 @@ export function Home() {
   const [nudgedIds, setNudgedIds] = useState<Set<string>>(new Set());
   const [cycleModal, setCycleModal] = useState<CycleResult | null>(null);
   const [heatmap, setHeatmap] = useState<{ date: string; count: number }[]>([]);
+  const [formatStats, setFormatStats] = useState<{ format: string; count: number }[]>([]);
 
   useEffect(() => {
     Promise.all([
@@ -102,6 +110,9 @@ export function Home() {
         .then((r) => setUnreadCount(r.unreadCount))
         .catch(() => {}),
       api.get<{ date: string; count: number }[]>('/users/me/heatmap').then(setHeatmap).catch(() => {}),
+      api.get<{ formatBreakdown: { format: string; count: number }[] }>('/users/me/stats')
+        .then((r) => setFormatStats(r.formatBreakdown))
+        .catch(() => {}),
     ]).finally(() => setLoadingFeed(false));
 
     checkEndedCycles();
@@ -253,6 +264,19 @@ export function Home() {
               <span className={styles.statLabel}>Constância</span>
             </div>
           </div>
+
+          {/* Format breakdown */}
+          {formatStats.length > 0 && (
+            <div className={styles.formatStatsRow}>
+              {formatStats.map(({ format, count }) => (
+                <div key={format} className={styles.formatStatPill}>
+                  <span>{FORMAT_EMOJI[format] ?? '📝'}</span>
+                  <span className={styles.formatStatCount}>{count}</span>
+                  <span className={styles.formatStatLabel}>{FORMAT_LABEL[format] ?? format}</span>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Weekly goal */}
           <div className={styles.section}>

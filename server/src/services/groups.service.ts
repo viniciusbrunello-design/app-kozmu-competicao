@@ -98,6 +98,7 @@ export async function getUserGroups(userId: string) {
             },
           },
           _count: { select: { members: true } },
+          scoringRules: true,
         },
       },
     },

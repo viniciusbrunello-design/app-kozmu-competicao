@@ -6,6 +6,15 @@ const router = Router();
 
 router.use(requireAuth);
 
+router.get('/me/stats', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const formatBreakdown = await usersService.getFormatStats(req.userId!);
+    res.json({ success: true, data: { formatBreakdown } });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get('/me/heatmap', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const heatmap = await usersService.getUserHeatmap(req.userId!);

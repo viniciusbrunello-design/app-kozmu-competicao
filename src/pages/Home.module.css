@@ -422,6 +422,41 @@
   letter-spacing: 0.05em;
 }
 
+/* Format stats row */
+.formatStatsRow {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.formatStatsRow::-webkit-scrollbar { display: none; }
+
+.formatStatPill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 6px 12px;
+  flex-shrink: 0;
+}
+
+.formatStatCount {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.formatStatLabel {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .statDivider {
   width: 1px;
   height: 32px;

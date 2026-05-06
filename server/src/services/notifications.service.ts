@@ -14,7 +14,8 @@ export type NotificationType =
   | 'proof_validated'
   | 'proof_rejected'
   | 'group_invite'
-  | 'nudge';
+  | 'nudge'
+  | 'streak_record';
 
 export async function createNotification(
   userId: string,
