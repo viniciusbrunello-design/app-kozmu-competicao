@@ -1,0 +1,193 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-base);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.back {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.headerTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.skeletonTitle {
+  width: 100px;
+  height: 16px;
+  background: var(--bg-surface);
+  border-radius: 6px;
+  animation: pulse 1.5s infinite;
+}
+
+.skeletonBlock {
+  height: 80px;
+  background: var(--bg-surface);
+  border-radius: 14px;
+  margin-bottom: 12px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profileCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profileTop {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.displayName {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.username {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.profileType {
+  font-size: 0.7rem;
+  color: var(--accent-purple);
+  background: rgba(139, 92, 246, 0.15);
+  border-radius: 6px;
+  padding: 2px 8px;
+  align-self: flex-start;
+  font-weight: 600;
+}
+
+.bio {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.leagueBadge {
+  font-size: 0.875rem;
+  font-weight: 700;
+  align-self: flex-start;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.statBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-surface);
+  border-radius: 14px;
+  padding: 14px 8px;
+}
+
+.statValue {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.achievementsCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sectionTitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0;
+}
+
+.achievementsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 6px;
+  border-radius: 12px;
+}
+
+.badgeUnlocked {
+  background: rgba(163, 230, 53, 0.1);
+  border: 1px solid rgba(163, 230, 53, 0.3);
+}
+
+.badgeLocked {
+  background: var(--bg-base);
+  border: 1px solid var(--border-color);
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+
+.badgeEmoji {
+  font-size: 1.5rem;
+}
+
+.badgeTitle {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  line-height: 1.3;
+}

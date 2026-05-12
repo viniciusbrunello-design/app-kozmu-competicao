@@ -6,6 +6,20 @@ const router = Router();
 
 router.use(requireAuth);
 
+router.put('/me/weekly-target', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { weeklyTarget } = req.body;
+    if (!Number.isInteger(weeklyTarget) || weeklyTarget < 1 || weeklyTarget > 7) {
+      res.status(400).json({ success: false, error: { message: 'Meta inválida (1–7)' } });
+      return;
+    }
+    await usersService.updateWeeklyTarget(req.userId!, weeklyTarget);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get('/me/stats', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const formatBreakdown = await usersService.getFormatStats(req.userId!);

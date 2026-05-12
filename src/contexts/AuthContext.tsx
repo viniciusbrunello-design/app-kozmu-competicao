@@ -30,7 +30,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const me = await authService.getMe();
       setUser(me);
     } catch {
-      setUser(null);
+      // Server errors (500, network) should not log the user out.
+      // Real auth failures (401) are handled by the kozmu:logout event in api.ts.
     }
   }, []);
 

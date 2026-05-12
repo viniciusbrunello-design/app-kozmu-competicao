@@ -8,6 +8,8 @@ export interface AvatarProps {
   status?: 'none' | 'active' | 'danger';
   fallback?: string;
   className?: string;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
+  style?: React.CSSProperties;
 }
 
 export function Avatar({
@@ -16,7 +18,9 @@ export function Avatar({
   size = 'md',
   status = 'none',
   fallback,
-  className
+  className,
+  onClick,
+  style,
 }: AvatarProps) {
   const getInitials = (name?: string) => {
     if (!name) return '?';
@@ -29,7 +33,7 @@ export function Avatar({
     styles.ring;
 
   return (
-    <div className={clsx(styles.avatarContainer, styles[size], className)}>
+    <div className={clsx(styles.avatarContainer, styles[size], className)} onClick={onClick} style={style}>
       <div className={status !== 'none' ? statusClass : ''}>
         {src ? (
           <img src={src} alt={alt} className={styles.avatar} />

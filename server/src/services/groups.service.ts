@@ -272,6 +272,47 @@ export async function getCycleResult(groupId: string, userId: string) {
   };
 }
 
+export async function updateGroupSettings(
+  groupId: string,
+  userId: string,
+  data: { rankingMode?: string; name?: string; description?: string },
+): Promise<void> {
+  const membership = await prisma.groupMember.findUnique({
+    where: { userId_groupId: { userId, groupId } },
+  });
+  if (!membership || membership.role !== 'admin') throw new ForbiddenError('Apenas admins podem editar o grupo');
+
+  await prisma.group.update({
+    where: { id: groupId },
+    data: {
+      ...(data.rankingMode !== undefined && { rankingMode: data.rankingMode }),
+      ...(data.name && { name: data.name }),
+      ...(data.description !== undefined && { description: data.description }),
+    },
+  });
+}
+
+export async function updateScoringRules(
+  groupId: string,
+  userId: string,
+  rules: { format: string; points: number }[],
+): Promise<void> {
+  const membership = await prisma.groupMember.findUnique({
+    where: { userId_groupId: { userId, groupId } },
+  });
+  if (!membership || membership.role !== 'admin') throw new ForbiddenError('Apenas admins podem editar o grupo');
+
+  await Promise.all(
+    rules.map((r) =>
+      prisma.groupScoringRule.upsert({
+        where: { groupId_format: { groupId, format: r.format } },
+        update: { points: r.points },
+        create: { groupId, format: r.format, points: r.points },
+      }),
+    ),
+  );
+}
+
 export async function resetGroupCycle(groupId: string): Promise<void> {
   const group = await prisma.group.findUnique({
     where: { id: groupId },

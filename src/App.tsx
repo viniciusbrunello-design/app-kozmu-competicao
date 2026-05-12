@@ -17,6 +17,8 @@ import { Notificacoes } from './pages/Notificacoes';
 import { Historico } from './pages/Historico';
 import { GrupoDetalhe } from './pages/GrupoDetalhe';
 import { Configuracoes } from './pages/Configuracoes';
+import { PerfilPublico } from './pages/PerfilPublico';
+import { NotificationToast } from './components/ui/NotificationToast';
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -24,6 +26,7 @@ function Layout({ children }: { children: React.ReactNode }) {
       <SideNav />
       {children}
       <BottomNav />
+      <NotificationToast />
     </div>
   );
 }
@@ -176,6 +179,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Configuracoes />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/perfil/:username"
+        element={
+          <ProtectedRoute>
+            <PerfilPublico />
           </ProtectedRoute>
         }
       />

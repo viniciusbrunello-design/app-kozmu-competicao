@@ -62,10 +62,29 @@ const DAILY_MISSIONS = [
   { emoji: '🚀', title: 'Publique em 2 formatos', desc: 'Diversifique! Quanto mais formatos, mais pontos.', format: null },
 ];
 
-function getDailyMission() {
+const PLATFORM_FORMATS: Record<string, string[]> = {
+  instagram: ['reel', 'carousel', 'feed', 'story'],
+  tiktok: ['reel'],
+  youtube: ['reel', 'live', 'feed'],
+  linkedin: ['linkedin'],
+  twitter: ['feed'],
+};
+
+function getDailyMission(platforms: string[] = []) {
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 0);
   const dayOfYear = Math.floor((now.getTime() - start.getTime()) / 86400000);
+
+  if (platforms.length > 0) {
+    const supported = new Set<string>();
+    for (const p of platforms) {
+      for (const fmt of PLATFORM_FORMATS[p] ?? []) supported.add(fmt);
+    }
+    const filtered = DAILY_MISSIONS.filter((m) => m.format === null || supported.has(m.format));
+    const pool = filtered.length > 0 ? filtered : DAILY_MISSIONS;
+    return pool[dayOfYear % pool.length];
+  }
+
   return DAILY_MISSIONS[dayOfYear % DAILY_MISSIONS.length];
 }
 
@@ -150,7 +169,7 @@ export function Home() {
   const weeklyTarget = streak?.weeklyTarget ?? 5;
   const weeklyProgress = Math.min(100, Math.round((weeklyCount / weeklyTarget) * 100));
   const shields = (streak as { catchUpTokens?: number } | undefined)?.catchUpTokens ?? 0;
-  const dailyMission = getDailyMission();
+  const dailyMission = getDailyMission(user?.platforms ?? []);
   const currentStreak = streak?.currentStreak ?? 0;
 
   // Heatmap-derived metrics
@@ -356,7 +375,7 @@ export function Home() {
                   Seu grupo ainda está quieto. Seja o primeiro a publicar hoje! 🚀
                 </div>
               ) : (
-                feed.slice(0, 5).map((item) => {
+                feed.filter((item) => item.type !== 'post_submitted').slice(0, 5).map((item) => {
                   const isMe = item.userId === user?.id;
                   const nudged = nudgedIds.has(item.userId);
                   return (
@@ -366,9 +385,17 @@ export function Home() {
                         size="sm"
                         fallback={item.user.displayName.slice(0, 2).toUpperCase()}
                         src={item.user.avatarUrl}
+                        onClick={() => navigate(`/perfil/${item.user.username}`)}
+                        style={{ cursor: 'pointer' }}
                       />
                       <div className={styles.activityContent}>
-                        <span className={styles.activityUser}>{item.user.displayName}</span>
+                        <button
+                          className={styles.activityUser}
+                          onClick={() => navigate(`/perfil/${item.user.username}`)}
+                          style={{ background: 'none', border: 'none', font: 'inherit', padding: 0, cursor: 'pointer', textAlign: 'left' }}
+                        >
+                          {item.user.displayName}
+                        </button>
                         <span className={styles.activityAction}>
                           {activityLabel(item.type, item.data)}
                         </span>

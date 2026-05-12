@@ -14,7 +14,7 @@ function getMonthStart(): Date {
   return d;
 }
 
-async function buildRanking(since: Date, groupId?: string) {
+async function buildRanking(since: Date, groupId?: string, rankingMode = 'points') {
   const where: Record<string, unknown> = {
     status: 'validated',
     createdAt: { gte: since },
@@ -39,37 +39,59 @@ async function buildRanking(since: Date, groupId?: string) {
 
   const map = new Map<
     string,
-    { user: (typeof submissions)[0]['user']; points: number; count: number }
+    { user: (typeof submissions)[0]['user']; points: number; count: number; formatCounts: Record<string, number> }
   >();
 
   for (const s of submissions) {
-    const existing = map.get(s.userId) ?? { user: s.user, points: 0, count: 0 };
+    const existing = map.get(s.userId) ?? { user: s.user, points: 0, count: 0, formatCounts: {} };
     existing.points += s.points;
     existing.count += 1;
+    existing.formatCounts[s.format] = (existing.formatCounts[s.format] ?? 0) + 1;
     map.set(s.userId, existing);
   }
 
-  return Array.from(map.values())
-    .sort((a, b) => b.points - a.points || (b.user.streak?.currentStreak ?? 0) - (a.user.streak?.currentStreak ?? 0))
-    .map((entry, index) => ({
-      rank: index + 1,
-      userId: entry.user.id,
-      displayName: entry.user.displayName,
-      username: entry.user.username,
-      avatarUrl: entry.user.avatarUrl,
-      league: entry.user.league,
-      points: entry.points,
-      submissionCount: entry.count,
-      currentStreak: entry.user.streak?.currentStreak ?? 0,
-    }));
+  const targetFormat = rankingMode.startsWith('format:') ? rankingMode.split(':')[1] : null;
+
+  const sorted = Array.from(map.values()).sort((a, b) => {
+    if (rankingMode === 'count') return b.count - a.count || b.points - a.points;
+    if (targetFormat) {
+      const af = a.formatCounts[targetFormat] ?? 0;
+      const bf = b.formatCounts[targetFormat] ?? 0;
+      return bf - af || b.points - a.points;
+    }
+    return b.points - a.points || (b.user.streak?.currentStreak ?? 0) - (a.user.streak?.currentStreak ?? 0);
+  });
+
+  return sorted.map((entry, index) => ({
+    rank: index + 1,
+    userId: entry.user.id,
+    displayName: entry.user.displayName,
+    username: entry.user.username,
+    avatarUrl: entry.user.avatarUrl,
+    league: entry.user.league,
+    points: entry.points,
+    submissionCount: entry.count,
+    currentStreak: entry.user.streak?.currentStreak ?? 0,
+    ...(targetFormat ? { formatCount: entry.formatCounts[targetFormat] ?? 0 } : {}),
+  }));
 }
 
 export async function getWeeklyRanking(groupId?: string) {
-  return buildRanking(getWeekStart(), groupId);
+  let rankingMode = 'points';
+  if (groupId) {
+    const group = await prisma.group.findUnique({ where: { id: groupId }, select: { rankingMode: true } });
+    rankingMode = group?.rankingMode ?? 'points';
+  }
+  return buildRanking(getWeekStart(), groupId, rankingMode);
 }
 
 export async function getMonthlyRanking(groupId?: string) {
-  return buildRanking(getMonthStart(), groupId);
+  let rankingMode = 'points';
+  if (groupId) {
+    const group = await prisma.group.findUnique({ where: { id: groupId }, select: { rankingMode: true } });
+    rankingMode = group?.rankingMode ?? 'points';
+  }
+  return buildRanking(getMonthStart(), groupId, rankingMode);
 }
 
 export async function getStreakRanking() {

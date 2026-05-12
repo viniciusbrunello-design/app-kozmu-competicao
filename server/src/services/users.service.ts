@@ -2,6 +2,25 @@ import prisma from '../prisma';
 import { NotFoundError } from '../utils/errors';
 import { getStreakStatus } from './streak.service';
 
+function computeAchievements(data: {
+  submissionCount: number;
+  bestStreak: number;
+  winCount: number;
+  challengeCount: number;
+  hasGroups: boolean;
+}) {
+  return [
+    { id: 'first_post', unlocked: data.submissionCount >= 1 },
+    { id: 'streak_7',   unlocked: data.bestStreak >= 7 },
+    { id: 'streak_14',  unlocked: data.bestStreak >= 14 },
+    { id: 'streak_30',  unlocked: data.bestStreak >= 30 },
+    { id: 'posts_50',   unlocked: data.submissionCount >= 50 },
+    { id: 'champion',   unlocked: data.winCount >= 1 },
+    { id: 'challenger', unlocked: data.challengeCount >= 1 },
+    { id: 'social',     unlocked: data.hasGroups },
+  ];
+}
+
 export async function getUserProfile(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -34,11 +53,22 @@ export async function getUserProfile(userId: string) {
     where: { userId, completed: true },
   });
 
+  const groupCount = await prisma.groupMember.count({ where: { userId } });
+
+  const achievements = computeAchievements({
+    submissionCount,
+    bestStreak: streak.bestStreak,
+    winCount: user.winCount,
+    challengeCount,
+    hasGroups: groupCount > 0,
+  });
+
   return {
     ...user,
     platforms: JSON.parse(user.platforms),
     streak,
     stats: { submissionCount, challengeCount },
+    achievements,
   };
 }
 
@@ -110,6 +140,14 @@ export async function getUserHeatmap(userId: string): Promise<{ date: string; co
   return result;
 }
 
+export async function updateWeeklyTarget(userId: string, weeklyTarget: number): Promise<void> {
+  await prisma.streak.upsert({
+    where: { userId },
+    update: { weeklyTarget },
+    create: { userId, weeklyTarget, weekStart: new Date() },
+  });
+}
+
 export async function getFormatStats(userId: string): Promise<{ format: string; count: number }[]> {
   const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const grouped = await prisma.submission.groupBy({
@@ -141,5 +179,26 @@ export async function getPublicProfile(username: string) {
   if (!user) throw new NotFoundError('Usuário');
 
   const streak = await getStreakStatus(user.id);
-  return { ...user, streak };
+
+  const submissionCount = await prisma.submission.count({
+    where: { userId: user.id, status: 'validated' },
+  });
+
+  const heatmap = await getUserHeatmap(user.id);
+  const activeDays = heatmap.filter((d) => d.count > 0).length;
+
+  const groupCount = await prisma.groupMember.count({ where: { userId: user.id } });
+  const challengeCount = await prisma.challengeParticipant.count({
+    where: { userId: user.id, completed: true },
+  });
+
+  const achievements = computeAchievements({
+    submissionCount,
+    bestStreak: streak.bestStreak,
+    winCount: user.winCount,
+    challengeCount,
+    hasGroups: groupCount > 0,
+  });
+
+  return { ...user, streak, submissionCount, activeDays, achievements };
 }

@@ -1,4 +1,5 @@
 import prisma from '../prisma';
+import { createNotification } from './notifications.service';
 
 export const DEFAULT_POINTS: Record<string, number> = {
   story: 1,
@@ -40,8 +41,14 @@ export async function addPointsToUser(userId: string, points: number, groupId?: 
   await updateLeague(userId);
 }
 
+const LEAGUE_ORDER = ['bronze', 'silver', 'gold', 'platinum', 'cosmos', 'nova', 'orbit'];
+const LEAGUE_LABELS: Record<string, string> = {
+  bronze: 'Bronze', silver: 'Prata', gold: 'Ouro',
+  platinum: 'Platina', cosmos: 'Cosmos', nova: 'Nova', orbit: 'Orbit',
+};
+
 async function updateLeague(userId: string): Promise<void> {
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { totalPoints: true } });
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { totalPoints: true, league: true } });
   if (!user) return;
 
   const leagues = [
@@ -54,6 +61,18 @@ async function updateLeague(userId: string): Promise<void> {
     { name: 'bronze', min: 0 },
   ];
 
-  const league = leagues.find((l) => user.totalPoints >= l.min) ?? leagues[leagues.length - 1];
-  await prisma.user.update({ where: { id: userId }, data: { league: league.name } });
+  const newLeague = leagues.find((l) => user.totalPoints >= l.min) ?? leagues[leagues.length - 1];
+
+  await prisma.user.update({ where: { id: userId }, data: { league: newLeague.name } });
+
+  const isUpgrade = LEAGUE_ORDER.indexOf(newLeague.name) > LEAGUE_ORDER.indexOf(user.league);
+  if (isUpgrade) {
+    await createNotification(
+      userId,
+      'rank_up',
+      `🎉 Você subiu para ${LEAGUE_LABELS[newLeague.name]}!`,
+      `Parabéns! Você alcançou a liga ${LEAGUE_LABELS[newLeague.name]}. Continue publicando para ir ainda mais longe!`,
+      { league: newLeague.name },
+    );
+  }
 }

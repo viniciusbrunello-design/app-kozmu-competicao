@@ -21,6 +21,8 @@ const PROFILE_TYPES = [
   { value: 'agency', label: 'Agência' },
 ];
 
+const WEEKLY_TARGET_OPTIONS = [3, 5, 7];
+
 export function Configuracoes() {
   const { user, refreshUser } = useAuth();
   const navigate = useNavigate();
@@ -34,6 +36,9 @@ export function Configuracoes() {
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
 
+  const [weeklyTarget, setWeeklyTarget] = useState(5);
+  const [targetSaving, setTargetSaving] = useState(false);
+
   useEffect(() => {
     if (user) {
       setDisplayName(user.displayName ?? '');
@@ -41,11 +46,23 @@ export function Configuracoes() {
       setBio(user.bio ?? '');
       setProfileType(user.profileType ?? 'creator');
       setPlatforms(Array.isArray(user.platforms) ? user.platforms : []);
+      setWeeklyTarget(user.streak?.weeklyTarget ?? 5);
     }
   }, [user]);
 
   function togglePlatform(id: string) {
     setPlatforms((prev) => prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]);
+  }
+
+  async function handleSelectTarget(target: number) {
+    setWeeklyTarget(target);
+    setTargetSaving(true);
+    try {
+      await api.put('/users/me/weekly-target', { weeklyTarget: target });
+      await refreshUser();
+    } catch { /* silently ignore — UI already reflects selection */ } finally {
+      setTargetSaving(false);
+    }
   }
 
   async function handleSave() {
@@ -136,6 +153,26 @@ export function Configuracoes() {
                 onClick={() => setProfileType(pt.value)}
               >
                 {pt.label}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Meta Semanal</h2>
+          <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', margin: 0 }}>
+            Quantas publicações você quer fazer por semana?
+          </p>
+          <div className={styles.typeGrid}>
+            {WEEKLY_TARGET_OPTIONS.map((t) => (
+              <button
+                key={t}
+                type="button"
+                className={`${styles.typeChip} ${weeklyTarget === t ? styles.typeActive : ''}`}
+                onClick={() => handleSelectTarget(t)}
+                disabled={targetSaving}
+              >
+                {t} dias
               </button>
             ))}
           </div>

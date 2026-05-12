@@ -1,17 +1,28 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Flame, MessageCircle, Copy, Share2, Plus, X, Wand2 } from 'lucide-react';
+import { ArrowLeft, Flame, MessageCircle, Copy, Share2, Plus, X, Wand2, Settings } from 'lucide-react';
 import { Avatar } from '../components/ui/Avatar';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
-import { getGroupDetails, getGroupRanking, getGroupActivity } from '../services/groups.service';
+import { getGroupDetails, getGroupRanking, getGroupActivity, updateGroupSettings, updateGroupScoringRules } from '../services/groups.service';
 import type { Group, RankingEntry, ActivityEntry } from '../services/groups.service';
 import { createSubmission } from '../services/submissions.service';
 import { api } from '../services/api';
 import styles from './GrupoDetalhe.module.css';
 
 const RANK_MEDAL: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
+
+const RANKING_MODE_OPTIONS = [
+  { value: 'points',          label: '🏆 Pontos' },
+  { value: 'count',           label: '📊 Quantidade' },
+  { value: 'format:reel',     label: '🎬 Reels' },
+  { value: 'format:carousel', label: '🖼️ Carrosseis' },
+  { value: 'format:feed',     label: '📷 Posts' },
+  { value: 'format:live',     label: '🔴 Lives' },
+  { value: 'format:linkedin', label: '💼 LinkedIn' },
+  { value: 'format:story',    label: '⭕ Stories' },
+];
 
 const LEAGUE_COLORS: Record<string, string> = {
   bronze: '#cd7f32', silver: '#c0c0c0', gold: '#ffd700',
@@ -111,6 +122,13 @@ export function GrupoDetalhe() {
   const [ciError, setCiError] = useState('');
   const [ciSuccess, setCiSuccess] = useState(false);
 
+  // Settings modal (admin only)
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [rankingModeEdit, setRankingModeEdit] = useState('points');
+  const [scoringRulesEdit, setScoringRulesEdit] = useState<Record<string, number>>({});
+  const [settingsSaving, setSettingsSaving] = useState(false);
+  const [settingsError, setSettingsError] = useState('');
+
   const load = useCallback(() => {
     if (!id) return;
     setLoading(true);
@@ -125,6 +143,14 @@ export function GrupoDetalhe() {
   }, [id]);
 
   useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    if (!group) return;
+    setRankingModeEdit(group.rankingMode ?? 'points');
+    const rules: Record<string, number> = {};
+    for (const r of group.scoringRules ?? []) rules[r.format] = r.points;
+    setScoringRulesEdit(rules);
+  }, [group]);
 
   const handleNudge = useCallback(async (targetUserId: string) => {
     if (!id) return;
@@ -156,6 +182,24 @@ export function GrupoDetalhe() {
       setCiFormat(detected.format);
     } else {
       setCiDetected(null);
+    }
+  }
+
+  async function handleSaveSettings() {
+    if (!id || !group) return;
+    setSettingsSaving(true);
+    setSettingsError('');
+    try {
+      await updateGroupSettings(id, { rankingMode: rankingModeEdit });
+      const rules = Object.entries(scoringRulesEdit).map(([format, points]) => ({ format, points }));
+      await updateGroupScoringRules(id, rules);
+      const updated = await getGroupDetails(id);
+      setGroup(updated);
+      setSettingsOpen(false);
+    } catch (err) {
+      setSettingsError(err instanceof Error ? err.message : 'Erro ao salvar');
+    } finally {
+      setSettingsSaving(false);
     }
   }
 
@@ -245,6 +289,15 @@ export function GrupoDetalhe() {
           <h1 className={styles.headerTitle}>{group!.name}</h1>
           <span className={styles.headerSub}>{group!.memberCount} membros · {daysLeft}d para reset</span>
         </div>
+        {group?.myRole === 'admin' && (
+          <button
+            className={styles.shareBtn}
+            onClick={() => { setSettingsError(''); setSettingsOpen(true); }}
+            aria-label="Configurações do grupo"
+          >
+            <Settings size={18} />
+          </button>
+        )}
         <button className={styles.shareBtn} onClick={handleShare} aria-label="Compartilhar convite">
           {copied ? <Copy size={18} /> : 'share' in navigator ? <Share2 size={18} /> : <Copy size={18} />}
         </button>
@@ -316,12 +369,18 @@ export function GrupoDetalhe() {
                       size="sm"
                       fallback={entry.displayName.slice(0, 2).toUpperCase()}
                       src={entry.avatarUrl}
+                      onClick={() => navigate(`/perfil/${entry.username}`)}
+                      style={{ cursor: 'pointer' }}
                     />
                     <div className={styles.rankInfo}>
-                      <span className={styles.rankName}>
+                      <button
+                        className={styles.rankName}
+                        onClick={() => navigate(`/perfil/${entry.username}`)}
+                        style={{ background: 'none', border: 'none', font: 'inherit', padding: 0, cursor: 'pointer', textAlign: 'left' }}
+                      >
                         {entry.displayName}
                         {isMe && <span className={styles.youBadge}>você</span>}
-                      </span>
+                      </button>
                       <span
                         className={styles.rankLeague}
                         style={{ color: LEAGUE_COLORS[entry.league] ?? 'var(--text-muted)' }}
@@ -366,9 +425,17 @@ export function GrupoDetalhe() {
                         size="sm"
                         fallback={item.user.displayName.slice(0, 2).toUpperCase()}
                         src={item.user.avatarUrl}
+                        onClick={() => navigate(`/perfil/${item.user.username}`)}
+                        style={{ cursor: 'pointer' }}
                       />
                       <div className={styles.postCardMeta}>
-                        <span className={styles.postCardName}>{item.user.displayName}</span>
+                        <button
+                          className={styles.postCardName}
+                          onClick={() => navigate(`/perfil/${item.user.username}`)}
+                          style={{ background: 'none', border: 'none', font: 'inherit', padding: 0, cursor: 'pointer', textAlign: 'left' }}
+                        >
+                          {item.user.displayName}
+                        </button>
                         <span className={styles.postCardTime}>{timeAgo(item.createdAt)}</span>
                       </div>
                     </div>
@@ -398,9 +465,17 @@ export function GrupoDetalhe() {
                       size="sm"
                       fallback={item.user.displayName.slice(0, 2).toUpperCase()}
                       src={item.user.avatarUrl}
+                      onClick={() => navigate(`/perfil/${item.user.username}`)}
+                      style={{ cursor: 'pointer' }}
                     />
                     <div className={styles.activityInfo}>
-                      <span className={styles.activityName}>{item.user.displayName}</span>
+                      <button
+                        className={styles.activityName}
+                        onClick={() => navigate(`/perfil/${item.user.username}`)}
+                        style={{ background: 'none', border: 'none', font: 'inherit', padding: 0, cursor: 'pointer', textAlign: 'left' }}
+                      >
+                        {item.user.displayName}
+                      </button>
                       <span className={styles.activityAction}>{getActivityText(item.type, item.data)}</span>
                     </div>
                     <span className={styles.activityTime}>{timeAgo(item.createdAt)}</span>
@@ -412,6 +487,60 @@ export function GrupoDetalhe() {
         )}
 
       </div>
+
+      {/* Settings modal (admin only) */}
+      {settingsOpen && (
+        <div className={styles.overlay} onClick={() => setSettingsOpen(false)}>
+          <div className={styles.ciModal} onClick={(e) => e.stopPropagation()} style={{ maxHeight: '85vh', overflowY: 'auto' }}>
+            <div className={styles.ciModalHeader}>
+              <h2 className={styles.ciModalTitle}>Configurações do Grupo</h2>
+              <button className={styles.ciCloseBtn} onClick={() => setSettingsOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            {settingsError && <div className={styles.ciError}>{settingsError}</div>}
+
+            <div className={styles.ciField}>
+              <label className={styles.ciLabel}>Modo de Ranking</label>
+              <div className={styles.ciFormatGrid}>
+                {RANKING_MODE_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    className={`${styles.ciFormatBtn} ${rankingModeEdit === opt.value ? styles.ciFormatActive : ''}`}
+                    onClick={() => setRankingModeEdit(opt.value)}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.ciField}>
+              <label className={styles.ciLabel}>Pontos por formato</label>
+              {CHECK_IN_FORMATS.map((f) => (
+                <div key={f.value} className={styles.settingsRuleRow}>
+                  <span>{f.emoji} {f.label}</span>
+                  <input
+                    type="number"
+                    min={0}
+                    max={20}
+                    className={styles.settingsRuleInput}
+                    value={scoringRulesEdit[f.value] ?? 0}
+                    onChange={(e) => setScoringRulesEdit((prev) => ({ ...prev, [f.value]: Number(e.target.value) }))}
+                  />
+                  <span className={styles.settingsRulePts}>pts</span>
+                </div>
+              ))}
+            </div>
+
+            <Button variant="primary" fullWidth onClick={handleSaveSettings} disabled={settingsSaving}>
+              {settingsSaving ? 'Salvando...' : 'Salvar configurações'}
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Check-in modal */}
       {checkIn && (

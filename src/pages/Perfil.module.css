@@ -244,3 +244,48 @@
 .actions {
   padding-bottom: 8px;
 }
+
+.achievementsCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.achievementsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 6px;
+  border-radius: 12px;
+}
+
+.badgeUnlocked {
+  background: rgba(163, 230, 53, 0.1);
+  border: 1px solid rgba(163, 230, 53, 0.3);
+}
+
+.badgeLocked {
+  background: var(--bg-base);
+  border: 1px solid var(--border-color);
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+
+.badgeEmoji {
+  font-size: 1.5rem;
+}
+
+.badgeTitle {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  line-height: 1.3;
+}

@@ -61,6 +61,7 @@ export async function getUserFeed(userId: string, limit = 30): Promise<unknown[]
 
   const activities = await prisma.activity.findMany({
     where: {
+      type: { not: 'post_submitted' },
       OR: [{ userId }, { groupId: { in: groupIds } }],
     },
     orderBy: { createdAt: 'desc' },

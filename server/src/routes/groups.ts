@@ -147,6 +147,29 @@ router.get('/:id/cycle-result', async (req: AuthRequest, res: Response, next: Ne
   }
 });
 
+router.put('/:id/settings', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    await groupsService.updateGroupSettings(req.params.id, req.userId!, req.body);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.put('/:id/scoring-rules', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { rules } = req.body;
+    if (!Array.isArray(rules)) {
+      res.status(400).json({ success: false, error: { message: 'rules deve ser um array' } });
+      return;
+    }
+    await groupsService.updateScoringRules(req.params.id, req.userId!, rules);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post('/:id/reset-cycle', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     await groupsService.resetGroupCycle(req.params.id);

@@ -9,6 +9,7 @@ import { ProgressBar } from '../components/ui/ProgressBar';
 import { HeatMap } from '../components/ui/HeatMap';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
+import { ACHIEVEMENTS_META } from '../utils/achievements';
 import styles from './Perfil.module.css';
 
 const LEAGUE_CONFIG: Record<string, { label: string; color: string }> = {
@@ -181,6 +182,29 @@ export function Perfil() {
           {heatmap.length > 0 && (
             <Card className={styles.heatmapCard}>
               <HeatMap data={heatmap} />
+            </Card>
+          )}
+
+          {/* Achievements */}
+          {user.achievements && (
+            <Card className={styles.achievementsCard}>
+              <h3 className={styles.sectionTitle}>Conquistas</h3>
+              <div className={styles.achievementsGrid}>
+                {ACHIEVEMENTS_META.map((meta) => {
+                  const status = user.achievements!.find((a) => a.id === meta.id);
+                  const unlocked = status?.unlocked ?? false;
+                  return (
+                    <div
+                      key={meta.id}
+                      className={`${styles.badge} ${unlocked ? styles.badgeUnlocked : styles.badgeLocked}`}
+                      title={meta.desc}
+                    >
+                      <span className={styles.badgeEmoji}>{meta.emoji}</span>
+                      <span className={styles.badgeTitle}>{meta.title}</span>
+                    </div>
+                  );
+                })}
+              </div>
             </Card>
           )}
 

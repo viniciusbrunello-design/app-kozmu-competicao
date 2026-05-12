@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Wand2, Trophy } from 'lucide-react';
 import { Header } from '../components/ui/Header';
@@ -76,6 +76,7 @@ export function Registrar() {
 
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const submitting = useRef(false);
 
   useEffect(() => {
     getMyGroups().then(setGroups).catch(() => {});
@@ -131,6 +132,8 @@ export function Registrar() {
 
   async function handleSubmit(e: { preventDefault(): void }) {
     e.preventDefault();
+    if (submitting.current) return;
+    submitting.current = true;
     setError('');
     setLoading(true);
     try {
@@ -146,6 +149,7 @@ export function Registrar() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao registrar publicação');
     } finally {
+      submitting.current = false;
       setLoading(false);
     }
   }

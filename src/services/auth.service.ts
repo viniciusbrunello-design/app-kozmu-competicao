@@ -25,6 +25,7 @@ export interface User {
     submissionCount: number;
     challengeCount: number;
   };
+  achievements?: { id: string; unlocked: boolean }[];
 }
 
 interface AuthResponse {

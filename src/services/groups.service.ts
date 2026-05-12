@@ -9,6 +9,7 @@ export interface Group {
   cycleDuration: string;
   maxMembers: number;
   isActive: boolean;
+  rankingMode: string;
   currentCycleStart: string;
   currentCycleEnd: string;
   myRole: string | null;
@@ -100,6 +101,20 @@ export async function getGroupActivity(groupId: string): Promise<ActivityEntry[]
 export async function getGroupInviteCode(groupId: string): Promise<string> {
   const res = await api.get<{ inviteCode: string }>(`/groups/${groupId}/invite`);
   return res.inviteCode;
+}
+
+export async function updateGroupSettings(
+  groupId: string,
+  data: { rankingMode?: string; name?: string; description?: string },
+): Promise<void> {
+  await api.put(`/groups/${groupId}/settings`, data);
+}
+
+export async function updateGroupScoringRules(
+  groupId: string,
+  rules: { format: string; points: number }[],
+): Promise<void> {
+  await api.put(`/groups/${groupId}/scoring-rules`, { rules });
 }
 
 export interface RankingEntry {
