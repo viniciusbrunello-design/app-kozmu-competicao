@@ -1,14 +1,14 @@
 import { NavLink } from 'react-router-dom';
 import clsx from 'clsx';
-import { Home, Users, Trophy, User, Plus } from 'lucide-react';
+import { Home, Compass, Users, User, Plus } from 'lucide-react';
 import styles from './SideNav.module.css';
 
 export function SideNav() {
   const navItems = [
-    { to: '/', icon: Home, label: 'Home' },
-    { to: '/grupos', icon: Users, label: 'Grupos' },
-    { to: '/desafios', icon: Trophy, label: 'Desafios' },
-    { to: '/perfil', icon: User, label: 'Perfil' },
+    { to: '/',       icon: Home,    label: 'Home',   end: true  },
+    { to: '/feed',   icon: Compass, label: 'Feed',   end: false },
+    { to: '/grupos', icon: Users,   label: 'Grupos', end: false },
+    { to: '/perfil', icon: User,    label: 'Perfil', end: false },
   ];
 
   return (
@@ -20,6 +20,7 @@ export function SideNav() {
           <NavLink
             key={item.to}
             to={item.to}
+            end={item.end}
             className={({ isActive }) => clsx(styles.item, isActive && styles.active)}
           >
             <item.icon size={22} />

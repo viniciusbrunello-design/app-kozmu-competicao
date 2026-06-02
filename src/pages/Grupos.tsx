@@ -26,16 +26,9 @@ const CYCLE_LABELS: Record<string, string> = {
 
 export function Grupos() {
   const navigate = useNavigate();
-  const [tab, setTab] = useState<'meus' | 'descobrir'>('meus');
-
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
-
-  const [publicGroups, setPublicGroups] = useState<PublicGroup[]>([]);
-  const [publicLoading, setPublicLoading] = useState(false);
-  const [publicLoaded, setPublicLoaded] = useState(false);
-  const [joiningId, setJoiningId] = useState<string | null>(null);
 
   const [modal, setModal] = useState<'create' | 'join' | null>(null);
   const [form, setForm] = useState({
@@ -55,19 +48,7 @@ export function Grupos() {
       .finally(() => setLoading(false));
   }
 
-  function fetchPublicGroups() {
-    setPublicLoading(true);
-    groupsService.getPublicGroups()
-      .then(setPublicGroups)
-      .catch(console.error)
-      .finally(() => { setPublicLoading(false); setPublicLoaded(true); });
-  }
-
   useEffect(() => { fetchGroups(); }, []);
-
-  useEffect(() => {
-    if (tab === 'descobrir' && !publicLoaded) fetchPublicGroups();
-  }, [tab, publicLoaded]);
 
   async function handleCreate(e: { preventDefault(): void }) {
     e.preventDefault();
@@ -106,20 +87,6 @@ export function Grupos() {
     }
   }
 
-  async function handleJoinPublic(groupId: string) {
-    setJoiningId(groupId);
-    try {
-      const group = await groupsService.joinPublicGroup(groupId);
-      setGroups((prev) => [group, ...prev]);
-      setPublicGroups((prev) => prev.map((g) => g.id === groupId ? { ...g, isMember: true } : g));
-      setTab('meus');
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao entrar no grupo');
-    } finally {
-      setJoiningId(null);
-    }
-  }
-
   async function handleShareCode(group: Group) {
     if (navigator.share) {
       try {
@@ -147,24 +114,7 @@ export function Grupos() {
       <div className="page-content">
         <div className={styles.page}>
 
-          <div className={styles.tabBar}>
-            <button
-              className={`${styles.tabBtn} ${tab === 'meus' ? styles.tabBtnActive : ''}`}
-              onClick={() => setTab('meus')}
-            >
-              Meus Grupos
-            </button>
-            <button
-              className={`${styles.tabBtn} ${tab === 'descobrir' ? styles.tabBtnActive : ''}`}
-              onClick={() => setTab('descobrir')}
-            >
-              <Globe size={13} />
-              Descobrir
-            </button>
-          </div>
-
-          {tab === 'meus' && (
-            <>
+          <>
               <div className={styles.actions}>
                 <Button variant="primary" icon={<Plus size={16} />} onClick={() => { setModal('create'); setError(''); }}>
                   Criar Grupo
@@ -191,7 +141,7 @@ export function Grupos() {
                     <Users size={40} style={{ color: 'var(--text-muted)', marginBottom: 12 }} />
                     <p>Você não está em nenhum grupo ainda.</p>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                      Crie um grupo ou explore grupos públicos na aba Descobrir.
+                      Crie um grupo ou explore comunidades na aba Feed.
                     </p>
                   </div>
                 </Card>
@@ -280,63 +230,6 @@ export function Grupos() {
                 </Card>
               ))}
             </>
-          )}
-
-          {tab === 'descobrir' && (
-            <>
-              {publicLoading && <div className={styles.empty}>Buscando grupos públicos...</div>}
-
-              {!publicLoading && publicGroups.length === 0 && (
-                <Card variant="glass">
-                  <div className={styles.empty}>
-                    <Globe size={40} style={{ color: 'var(--text-muted)', marginBottom: 12 }} />
-                    <p>Nenhum grupo público disponível.</p>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                      Crie um grupo público para que outros possam entrar.
-                    </p>
-                  </div>
-                </Card>
-              )}
-
-              {publicGroups.map((group) => (
-                <Card key={group.id} variant="glass" className={styles.publicCard}>
-                  <div className={styles.publicCardRow}>
-                    <div className={styles.publicCardInfo}>
-                      <h3 className={styles.groupName}>{group.name}</h3>
-                      {group.description && (
-                        <p className={styles.groupDesc}>{group.description}</p>
-                      )}
-                      <div className={styles.publicMeta}>
-                        <span className={styles.publicMetaItem}>
-                          <Users size={11} />
-                          {group.memberCount} membros
-                        </span>
-                        <span className={styles.publicMetaItem}>
-                          ciclo {CYCLE_LABELS[group.cycleDuration] ?? group.cycleDuration}
-                        </span>
-                      </div>
-                    </div>
-                    {group.isMember ? (
-                      <button
-                        className={styles.joinedBtn}
-                        onClick={() => navigate(`/grupos/${group.id}`)}
-                      >
-                        Ver
-                      </button>
-                    ) : (
-                      <button
-                        className={styles.joinPublicBtn}
-                        onClick={() => handleJoinPublic(group.id)}
-                        disabled={joiningId === group.id}
-                      >
-                        {joiningId === group.id ? '...' : 'Entrar'}
-                      </button>
-                    )}
-                  </div>
-                </Card>
-              ))}
-            </>
-          )}
 
         </div>
       </div>

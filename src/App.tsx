@@ -18,6 +18,7 @@ import { Historico } from './pages/Historico';
 import { GrupoDetalhe } from './pages/GrupoDetalhe';
 import { Configuracoes } from './pages/Configuracoes';
 import { PerfilPublico } from './pages/PerfilPublico';
+import { Feed } from './pages/Feed';
 import { NotificationToast } from './components/ui/NotificationToast';
 
 function Layout({ children }: { children: React.ReactNode }) {
@@ -96,6 +97,16 @@ function AppRoutes() {
           <ProtectedRoute>
             <Layout>
               <Home />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/feed"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <Feed />
             </Layout>
           </ProtectedRoute>
         }

@@ -1,49 +1,32 @@
 import { NavLink } from 'react-router-dom';
 import clsx from 'clsx';
-import { Home, Users, Trophy, User, Plus } from 'lucide-react';
+import { Home, Compass, Users, User } from 'lucide-react';
 import styles from './BottomNav.module.css';
 
-export function BottomNav() {
-  const navItems = [
-    { to: '/', icon: Home, label: 'Home' },
-    { to: '/grupos', icon: Users, label: 'Grupos' },
-    { to: '/registrar', icon: Plus, label: 'Postar', isFab: true },
-    { to: '/desafios', icon: Trophy, label: 'Desafios' },
-    { to: '/perfil', icon: User, label: 'Perfil' },
-  ];
+const NAV_ITEMS = [
+  { to: '/',       icon: Home,    label: 'Home',   end: true },
+  { to: '/feed',   icon: Compass, label: 'Feed',   end: false },
+  { to: '/grupos', icon: Users,   label: 'Grupos', end: false },
+  { to: '/perfil', icon: User,    label: 'Perfil', end: false },
+];
 
+export function BottomNav() {
   return (
     <nav className={styles.nav}>
       <div className={styles.inner}>
-        {navItems.map((item) => {
-          if (item.isFab) {
-            return (
-              <NavLink 
-                key={item.to} 
-                to={item.to} 
-                className={styles.fabItem}
-                aria-label={item.label}
-              >
-                <div className={styles.fab}>
-                  <item.icon size={28} strokeWidth={2.5} />
-                </div>
-              </NavLink>
-            );
-          }
-
-          return (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) => clsx(styles.item, isActive && styles.active)}
-            >
-              <div className={styles.iconWrapper}>
-                <item.icon size={24} />
-              </div>
-              <span>{item.label}</span>
-            </NavLink>
-          );
-        })}
+        {NAV_ITEMS.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.end}
+            className={({ isActive }) => clsx(styles.item, isActive && styles.active)}
+          >
+            <div className={styles.iconWrapper}>
+              <item.icon size={24} />
+            </div>
+            <span>{item.label}</span>
+          </NavLink>
+        ))}
       </div>
     </nav>
   );
