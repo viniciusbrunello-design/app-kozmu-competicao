@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Flame, MessageCircle, Copy, Share2, Plus, X, Wand2, Settings } from 'lucide-react';
+import { ArrowLeft, Flame, MessageCircle, Copy, Share2, Plus, X, Wand2, Settings, UserX, Info } from 'lucide-react';
 import { Avatar } from '../components/ui/Avatar';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -30,20 +30,22 @@ const LEAGUE_COLORS: Record<string, string> = {
 };
 
 const FORMAT_EMOJI: Record<string, string> = {
-  reel: '🎬', carousel: '🖼️', feed: '📷', live: '🔴', linkedin: '💼', story: '⭕',
+  reel: '🎬', carousel: '🖼️', feed: '📷', live: '🔴', linkedin: '💼', story: '⭕', podcast: '🎙️', other: '📌',
 };
 
 const FORMAT_LABEL: Record<string, string> = {
-  reel: 'Reel', carousel: 'Carrossel', feed: 'Post', live: 'Live', linkedin: 'LinkedIn', story: 'Story',
+  reel: 'Reel', carousel: 'Carrossel', feed: 'Post', live: 'Live', linkedin: 'LinkedIn', story: 'Story', podcast: 'Podcast', other: 'Outros',
 };
 
 const CHECK_IN_FORMATS = [
-  { value: 'reel', emoji: '🎬', label: 'Reel' },
+  { value: 'reel',     emoji: '🎬', label: 'Reel' },
   { value: 'carousel', emoji: '🖼️', label: 'Carrossel' },
-  { value: 'feed', emoji: '📷', label: 'Post' },
-  { value: 'live', emoji: '🔴', label: 'Live' },
+  { value: 'feed',     emoji: '📷', label: 'Post' },
+  { value: 'live',     emoji: '🔴', label: 'Live' },
   { value: 'linkedin', emoji: '💼', label: 'LinkedIn' },
-  { value: 'story', emoji: '⭕', label: 'Story' },
+  { value: 'story',    emoji: '⭕', label: 'Story' },
+  { value: 'podcast',  emoji: '🎙️', label: 'Podcast' },
+  { value: 'other',    emoji: '📌', label: 'Outros' },
 ];
 
 interface DetectResult { platform: string; format: string; label: string }
@@ -182,6 +184,34 @@ export function GrupoDetalhe() {
       setCiFormat(detected.format);
     } else {
       setCiDetected(null);
+    }
+  }
+
+  async function handleRemoveMember(targetUserId: string) {
+    if (!id) return;
+    if (!confirm('Remover este membro do grupo?')) return;
+    try {
+      await api.delete(`/groups/${id}/members/${targetUserId}`);
+      setRanking((prev) => prev.filter((r) => r.userId !== targetUserId));
+      getGroupDetails(id).then(setGroup).catch(() => {});
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Erro ao remover membro');
+    }
+  }
+
+  async function handleEndGroup() {
+    if (!id) return;
+    if (!confirm('Encerrar o grupo agora? Esta ação não pode ser desfeita.')) return;
+    setSettingsSaving(true);
+    setSettingsError('');
+    try {
+      await api.post(`/groups/${id}/end`);
+      setSettingsOpen(false);
+      load();
+    } catch (err) {
+      setSettingsError(err instanceof Error ? err.message : 'Erro ao encerrar grupo');
+    } finally {
+      setSettingsSaving(false);
     }
   }
 
@@ -324,6 +354,23 @@ export function GrupoDetalhe() {
           </Card>
         )}
 
+        {/* Regras do grupo */}
+        {group!.scoringRules && group!.scoringRules.length > 0 && (
+          <div className={styles.rulesSection}>
+            <div className={styles.rulesHeader}>
+              <Info size={12} />
+              <span>Pontuação do grupo</span>
+            </div>
+            <div className={styles.rulesList}>
+              {group!.scoringRules.filter((r) => r.points > 0).map((r) => (
+                <span key={r.format} className={styles.ruleChip}>
+                  {FORMAT_EMOJI[r.format] ?? '📝'} {FORMAT_LABEL[r.format] ?? r.format}: <strong>{r.points}pts</strong>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Check-in CTA */}
         <button
           className={styles.checkInCta}
@@ -391,16 +438,27 @@ export function GrupoDetalhe() {
                     </div>
                     <div className={styles.rankRight}>
                       <span className={styles.rankPoints}>{entry.points} pts</span>
-                      {!isMe && (
-                        <button
-                          className={`${styles.nudgeBtn} ${nudged ? styles.nudgeDone : ''}`}
-                          onClick={() => handleNudge(entry.userId)}
-                          disabled={nudged}
-                          title={nudged ? 'Cobrado!' : 'Cobrar'}
-                        >
-                          <MessageCircle size={14} />
-                        </button>
-                      )}
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        {!isMe && (
+                          <button
+                            className={`${styles.nudgeBtn} ${nudged ? styles.nudgeDone : ''}`}
+                            onClick={() => handleNudge(entry.userId)}
+                            disabled={nudged}
+                            title={nudged ? 'Cobrado!' : 'Cobrar'}
+                          >
+                            <MessageCircle size={14} />
+                          </button>
+                        )}
+                        {group?.myRole === 'admin' && !isMe && (
+                          <button
+                            className={styles.removeBtn}
+                            onClick={() => handleRemoveMember(entry.userId)}
+                            title="Remover membro"
+                          >
+                            <UserX size={14} />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
@@ -538,6 +596,10 @@ export function GrupoDetalhe() {
             <Button variant="primary" fullWidth onClick={handleSaveSettings} disabled={settingsSaving}>
               {settingsSaving ? 'Salvando...' : 'Salvar configurações'}
             </Button>
+
+            <button className={styles.endGroupBtn} onClick={handleEndGroup} disabled={settingsSaving}>
+              Encerrar grupo antecipadamente
+            </button>
           </div>
         </div>
       )}

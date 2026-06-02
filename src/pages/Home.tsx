@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Flame, TrendingUp, Plus, Trophy, MessageCircle, Shield, Zap } from 'lucide-react';
+import { Flame, TrendingUp, Plus, Trophy, MessageCircle, Shield, Zap, Target } from 'lucide-react';
 import { SkeletonActivityItem } from '../components/ui/Skeleton';
 import { Header } from '../components/ui/Header';
 import { Card } from '../components/ui/Card';
@@ -10,6 +10,7 @@ import { Button } from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
 import { getMyRank } from '../services/ranking.service';
 import type { ActivityEntry } from '../services/groups.service';
+import type { UserGoal } from '../services/goals.service';
 import { api } from '../services/api';
 import styles from './Home.module.css';
 
@@ -49,6 +50,23 @@ function activityLabel(type: string, data: Record<string, unknown>): string {
     default:
       return type;
   }
+}
+
+const MOTIVATIONAL_PHRASES = [
+  'Crie mais. Consuma menos.',
+  'Consistência supera perfeição.',
+  'O melhor momento para publicar era ontem. O segundo melhor é agora.',
+  'Cada post é um passo à frente da sua versão de ontem.',
+  'Não espere a inspiração. Crie o hábito.',
+  'Você não precisa ser perfeito — precisa ser consistente.',
+  'Seu público está esperando por você.',
+];
+
+function getDailyPhrase(): string {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const day = Math.floor((now.getTime() - start.getTime()) / 86400000);
+  return MOTIVATIONAL_PHRASES[day % MOTIVATIONAL_PHRASES.length];
 }
 
 // Daily mission — seeded by day of year so everyone sees the same one
@@ -119,6 +137,7 @@ export function Home() {
   const [cycleModal, setCycleModal] = useState<CycleResult | null>(null);
   const [heatmap, setHeatmap] = useState<{ date: string; count: number }[]>([]);
   const [formatStats, setFormatStats] = useState<{ format: string; count: number }[]>([]);
+  const [activeGoal, setActiveGoal] = useState<UserGoal | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -131,6 +150,12 @@ export function Home() {
       api.get<{ date: string; count: number }[]>('/users/me/heatmap').then(setHeatmap).catch(() => {}),
       api.get<{ formatBreakdown: { format: string; count: number }[] }>('/users/me/stats')
         .then((r) => setFormatStats(r.formatBreakdown))
+        .catch(() => {}),
+      api.get<UserGoal[]>('/goals')
+        .then((goals) => {
+          const first = goals.find((g) => g.isActive && !g.completed);
+          setActiveGoal(first ?? null);
+        })
         .catch(() => {}),
     ]).finally(() => setLoadingFeed(false));
 
@@ -195,6 +220,8 @@ export function Home() {
     100: '🌌 100 dias!! Você está em órbita, criador(a)!',
   };
   const milestoneMsg = MILESTONES[currentStreak] ?? null;
+  const isNewRecord = currentStreak > 1 && currentStreak === (streak?.bestStreak ?? 0);
+  const motivationalPhrase = getDailyPhrase();
 
   return (
     <>
@@ -211,6 +238,16 @@ export function Home() {
             </div>
             <Avatar alt={user?.displayName ?? ''} size="md" status={streak?.atRisk ? 'danger' : 'active'} />
           </div>
+
+          {/* Frase motivacional */}
+          <p className={styles.motivationalPhrase}>"{motivationalPhrase}"</p>
+
+          {/* Novo recorde de streak */}
+          {isNewRecord && !milestoneMsg && (
+            <div className={styles.recordBanner}>
+              ⭐ Você está no seu recorde pessoal de streak! Continue assim!
+            </div>
+          )}
 
           {/* Comeback nudge */}
           {showComeback && (
@@ -323,6 +360,35 @@ export function Home() {
               <ProgressBar progress={weeklyProgress} label="Progresso" color="blue" />
             </Card>
           </div>
+
+          {/* Meta pessoal ativa */}
+          {activeGoal && (
+            <div className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h3 className={styles.sectionTitle}>Meta Ativa</h3>
+                <a
+                  href="#"
+                  className={styles.seeAll}
+                  onClick={(e) => { e.preventDefault(); navigate('/metas'); }}
+                >
+                  Ver todas
+                </a>
+              </div>
+              <Card onClick={() => navigate('/metas')} style={{ cursor: 'pointer' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                  <Target size={15} style={{ color: 'var(--accent-purple)', flexShrink: 0 }} />
+                  <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    {activeGoal.title}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 8 }}>
+                  <span>{activeGoal.progress}/{activeGoal.targetCount} posts</span>
+                  <span style={{ fontWeight: 700, color: 'var(--accent-purple)' }}>{activeGoal.percentage}%</span>
+                </div>
+                <ProgressBar progress={activeGoal.percentage} color="purple" size="sm" showValue={false} />
+              </Card>
+            </div>
+          )}
 
           {/* Daily mission */}
           <div className={styles.section}>

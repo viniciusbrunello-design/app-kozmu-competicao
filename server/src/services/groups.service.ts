@@ -272,6 +272,33 @@ export async function getCycleResult(groupId: string, userId: string) {
   };
 }
 
+export async function removeMember(groupId: string, adminUserId: string, targetUserId: string): Promise<void> {
+  const adminMembership = await prisma.groupMember.findUnique({
+    where: { userId_groupId: { userId: adminUserId, groupId } },
+  });
+  if (!adminMembership || adminMembership.role !== 'admin') throw new ForbiddenError('Apenas admins podem remover membros');
+  if (adminUserId === targetUserId) throw new ForbiddenError('Você não pode se remover desta forma');
+
+  const target = await prisma.groupMember.findUnique({
+    where: { userId_groupId: { userId: targetUserId, groupId } },
+  });
+  if (!target) throw new NotFoundError('Membro');
+
+  await prisma.groupMember.delete({ where: { userId_groupId: { userId: targetUserId, groupId } } });
+}
+
+export async function endGroup(groupId: string, adminUserId: string): Promise<void> {
+  const membership = await prisma.groupMember.findUnique({
+    where: { userId_groupId: { userId: adminUserId, groupId } },
+  });
+  if (!membership || membership.role !== 'admin') throw new ForbiddenError('Apenas admins podem encerrar o grupo');
+
+  await prisma.group.update({
+    where: { id: groupId },
+    data: { isActive: false, currentCycleEnd: new Date() },
+  });
+}
+
 export async function updateGroupSettings(
   groupId: string,
   userId: string,

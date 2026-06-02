@@ -7,6 +7,7 @@ import challengesRouter from './challenges';
 import rankingRouter from './ranking';
 import activityRouter from './activity';
 import notificationsRouter from './notifications';
+import goalsRouter from './goals';
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use('/challenges', challengesRouter);
 router.use('/ranking', rankingRouter);
 router.use('/activity', activityRouter);
 router.use('/notifications', notificationsRouter);
+router.use('/goals', goalsRouter);
 
 export default router;

@@ -7,7 +7,7 @@ function computeAchievements(data: {
   bestStreak: number;
   winCount: number;
   challengeCount: number;
-  hasGroups: boolean;
+  groupCount: number;
 }) {
   return [
     { id: 'first_post', unlocked: data.submissionCount >= 1 },
@@ -17,7 +17,7 @@ function computeAchievements(data: {
     { id: 'posts_50',   unlocked: data.submissionCount >= 50 },
     { id: 'champion',   unlocked: data.winCount >= 1 },
     { id: 'challenger', unlocked: data.challengeCount >= 1 },
-    { id: 'social',     unlocked: data.hasGroups },
+    { id: 'social',     unlocked: data.groupCount >= 2 },
   ];
 }
 
@@ -60,7 +60,7 @@ export async function getUserProfile(userId: string) {
     bestStreak: streak.bestStreak,
     winCount: user.winCount,
     challengeCount,
-    hasGroups: groupCount > 0,
+    groupCount,
   });
 
   return {
@@ -197,7 +197,7 @@ export async function getPublicProfile(username: string) {
     bestStreak: streak.bestStreak,
     winCount: user.winCount,
     challengeCount,
-    hasGroups: groupCount > 0,
+    groupCount,
   });
 
   return { ...user, streak, submissionCount, activeDays, achievements };

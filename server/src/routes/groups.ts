@@ -170,6 +170,24 @@ router.put('/:id/scoring-rules', async (req: AuthRequest, res: Response, next: N
   }
 });
 
+router.delete('/:id/members/:userId', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    await groupsService.removeMember(req.params.id, req.userId!, req.params.userId);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/:id/end', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    await groupsService.endGroup(req.params.id, req.userId!);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post('/:id/reset-cycle', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     await groupsService.resetGroupCycle(req.params.id);

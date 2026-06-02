@@ -22,9 +22,10 @@ model User {
   league       String   @default("bronze")
   winCount     Int      @default(0)
   isPro        Boolean  @default(false)
-  refreshToken String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  refreshToken            String?
+  onboardingPostsPerMonth Int?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 
   streak                Streak?
   groupMemberships      GroupMember[]
@@ -33,6 +34,7 @@ model User {
   activities            Activity[]
   challengeParticipants ChallengeParticipant[]
   invitesSent           GroupInvite[]          @relation("InviteSender")
+  goals                 UserGoal[]
 }
 
 model Streak {
@@ -188,4 +190,18 @@ model GroupInvite {
 
   group  Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
   sender User  @relation("InviteSender", fields: [senderId], references: [id], onDelete: Cascade)
+}
+
+model UserGoal {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  targetCount Int
+  format      String?
+  startDate   DateTime
+  endDate     DateTime
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

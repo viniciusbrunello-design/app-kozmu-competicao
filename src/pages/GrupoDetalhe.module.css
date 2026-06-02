@@ -580,3 +580,79 @@
   color: var(--text-muted);
   flex-shrink: 0;
 }
+
+/* Regras visíveis */
+.rulesSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+}
+
+.rulesHeader {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.rulesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ruleChip {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background: var(--bg-base);
+  border-radius: 8px;
+  padding: 3px 8px;
+}
+
+/* Remove member button */
+.removeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: transparent;
+  color: var(--status-error);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.removeBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* End group button */
+.endGroupBtn {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--status-error);
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-top: 4px;
+}
+
+.endGroupBtn:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.endGroupBtn:disabled { opacity: 0.5; cursor: default; }

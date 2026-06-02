@@ -16,6 +16,8 @@ const FORMATS = [
   { value: 'live',      label: 'Live',                    defaultPoints: 8, emoji: '🔴' },
   { value: 'linkedin',  label: 'LinkedIn',                defaultPoints: 4, emoji: '💼' },
   { value: 'story',     label: 'Story',                   defaultPoints: 1, emoji: '⭕' },
+  { value: 'podcast',   label: 'Podcast',                 defaultPoints: 3, emoji: '🎙️' },
+  { value: 'other',     label: 'Outros',                  defaultPoints: 2, emoji: '📌' },
 ];
 
 interface DetectResult {

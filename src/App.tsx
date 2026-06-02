@@ -19,6 +19,7 @@ import { GrupoDetalhe } from './pages/GrupoDetalhe';
 import { Configuracoes } from './pages/Configuracoes';
 import { PerfilPublico } from './pages/PerfilPublico';
 import { Feed } from './pages/Feed';
+import { Metas } from './pages/Metas';
 import { NotificationToast } from './components/ui/NotificationToast';
 
 function Layout({ children }: { children: React.ReactNode }) {
@@ -190,6 +191,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Configuracoes />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/metas"
+        element={
+          <ProtectedRoute>
+            <Metas />
           </ProtectedRoute>
         }
       />

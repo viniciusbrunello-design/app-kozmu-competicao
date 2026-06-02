@@ -210,6 +210,11 @@ export function Perfil() {
 
           {/* Quick links */}
           <div className={styles.quickLinks}>
+            <button className={styles.quickLink} onClick={() => navigate('/metas')}>
+              <Target size={18} className={styles.quickLinkIcon} />
+              <span>Minhas metas</span>
+              <ChevronRight size={16} className={styles.quickLinkChevron} />
+            </button>
             <button className={styles.quickLink} onClick={() => navigate('/historico')}>
               <History size={18} className={styles.quickLinkIcon} />
               <span>Histórico de publicações</span>
