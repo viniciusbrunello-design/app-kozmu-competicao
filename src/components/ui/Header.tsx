@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './Header.module.css';
 
 export interface HeaderProps {
-  title: string | React.ReactNode;
+  title?: string | React.ReactNode;
   showNotifications?: boolean;
   showSettings?: boolean;
   hasUnreadNotif?: boolean;
@@ -20,7 +20,7 @@ export function Header({
 
   return (
     <header className={styles.header}>
-      <h1 className={styles.title}>{title}</h1>
+      {title && <h1 className={styles.title}>{title}</h1>}
 
       <div className={styles.right}>
         {showNotifications && (

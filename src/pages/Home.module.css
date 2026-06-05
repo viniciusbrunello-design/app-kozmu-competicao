@@ -1,180 +1,386 @@
 .home {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
-.welcome {
+/* ---- Greeting ---- */
+.greetingRow {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
 }
 
 .greeting {
-  display: flex;
-  flex-direction: column;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.15;
 }
 
-.greeting span {
+/* ---- Streak Card ---- */
+.streakCard {
+  background: var(--bg-base);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 24px 20px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.streakLeft {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.streakNumber {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.streakSubLabel {
   font-size: 0.875rem;
   color: var(--text-secondary);
 }
 
-.greeting h2 {
-  font-size: 1.5rem;
+.shieldTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: rgba(99, 179, 237, 0.15);
+  border: 1px solid rgba(99, 179, 237, 0.25);
+  color: #63b3ed;
+  font-size: 0.7rem;
+  font-weight: 600;
+  align-self: flex-start;
+}
+
+.streakSep {
+  width: 1px;
+  height: 52px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 20px;
+  flex-shrink: 0;
+}
+
+.streakRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.recordLabel {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.recordValue {
+  font-size: 1.375rem;
+  font-weight: 800;
   color: var(--text-primary);
 }
 
-.motivationalPhrase {
-  font-size: 0.8125rem;
-  color: var(--text-muted);
-  font-style: italic;
-  text-align: center;
-  margin: -8px 0 0;
-  padding: 0 4px;
-}
-
-.recordBanner {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.08));
-  border: 1px solid rgba(251, 191, 36, 0.35);
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-size: 0.875rem;
+.newRecordTag {
+  font-size: 0.6875rem;
+  font-weight: 700;
   color: #f59e0b;
-  font-weight: 600;
-  text-align: center;
+  background: rgba(245, 158, 11, 0.15);
+  border-radius: 6px;
+  padding: 2px 6px;
+  margin-top: 4px;
 }
 
-.streakCard {
-  position: relative;
-  overflow: hidden;
+/* ---- Stats Grid ---- */
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.statCard {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 32px 20px;
+  padding: 20px 12px !important;
+  gap: 4px;
 }
 
-.streakTitle {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  margin-bottom: 8px;
-}
-
-.streakValue {
-  font-size: 4rem;
+.statNumber {
+  font-size: 2rem;
   font-weight: 800;
-  line-height: 1;
-  color: var(--accent-lime);
-  text-shadow: 0 0 20px var(--accent-lime-glow);
-  margin-bottom: 8px;
-}
-
-.streakSub {
-  font-size: 0.875rem;
   color: var(--text-primary);
+  line-height: 1;
 }
 
-.fireIcon {
-  color: var(--accent-lime);
-  filter: drop-shadow(0 0 10px var(--accent-lime-glow));
+.statCaption {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: lowercase;
+}
+
+/* ---- Calendar ---- */
+.calendar {
+  padding: 16px !important;
+}
+
+.calendarTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
   margin-bottom: 12px;
 }
 
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendarWeekDay {
+  text-align: center;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  padding: 2px 0 6px;
+  text-transform: uppercase;
+}
+
+.calendarDay {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.calendarDayActive {
+  background: var(--text-primary);
+  color: var(--bg-base);
+  font-weight: 700;
+  border-radius: 8px;
+}
+
+.calendarDayToday {
+  border: 1px solid var(--border-highlight);
+  color: var(--text-secondary);
+}
+
+/* ---- Achievement Banner ---- */
+.achievementBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.achievementIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.achievementText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.achievementTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.achievementDesc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ---- Sections ---- */
 .section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+}
+
+.sectionLabel {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .sectionHeader {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
 
 .sectionTitle {
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   color: var(--text-primary);
 }
 
-.seeAll {
-  font-size: 0.875rem;
-  color: var(--accent-blue);
-}
-
-.activityItem {
+/* ---- Groups ---- */
+.groupRow {
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
+  background: none;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
   padding: 12px 0;
+  text-align: left;
+  transition: opacity 0.15s;
+}
+
+.groupRow:hover { opacity: 0.8; }
+
+.groupRowBorder {
   border-bottom: 1px solid var(--border-color);
 }
 
-.activityItem:last-child {
-  border-bottom: none;
-}
-
-.activityContent {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.activityUser {
-  font-weight: 600;
-  font-size: 0.9375rem;
-  color: var(--text-primary);
-}
-
-.activityAction {
-  font-size: 0.8125rem;
-  color: var(--text-secondary);
-}
-
-.activityRight {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.activityTime {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-.nudgeBtn {
+.groupEmoji {
+  font-size: 1.75rem;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: 1px solid var(--border-color);
-  background: transparent;
+  background: var(--bg-base);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.groupInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.groupName {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.groupSub {
+  font-size: 0.8rem;
   color: var(--text-muted);
-  cursor: pointer;
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 
-.nudgeBtn:hover:not(:disabled) {
-  color: var(--accent-blue);
-  border-color: var(--accent-blue);
-  background: rgba(99, 179, 237, 0.1);
+.groupChevron {
+  color: var(--text-muted);
+  flex-shrink: 0;
 }
 
-.nudgeBtn.nudgeDone {
+/* ---- Daily Mission ---- */
+.missionBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--accent-purple);
+  background: rgba(139, 92, 246, 0.15);
+  border-radius: 8px;
+  padding: 3px 8px;
+}
+
+.missionCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: filter 0.15s;
+}
+
+.missionCard:hover { filter: brightness(1.08); }
+
+.missionEmoji {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.missionContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.missionTitle {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.missionDesc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.missionArrow {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* ---- Weekly meta ---- */
+.weeklyRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.weeklyLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.weeklyCount {
+  font-size: 0.875rem;
+  font-weight: 700;
   color: var(--accent-lime);
-  border-color: var(--accent-lime);
-  background: rgba(163, 230, 53, 0.1);
-  cursor: default;
 }
 
-/* Cycle end modal */
+.weeklyHint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+/* ---- Cycle end modal ---- */
 .modalOverlay {
   position: fixed;
   inset: 0;
@@ -240,9 +446,7 @@
   transform: translateY(-8px);
 }
 
-.cycleMedal {
-  font-size: 1.25rem;
-}
+.cycleMedal { font-size: 1.25rem; }
 
 .cyclePodiumName {
   font-size: 0.75rem;
@@ -263,223 +467,4 @@
   background: var(--bg-base);
   border-radius: 12px;
   padding: 12px;
-}
-
-.shieldBadge {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-top: 10px;
-  padding: 4px 12px;
-  border-radius: 99px;
-  background: rgba(99, 179, 237, 0.15);
-  border: 1px solid rgba(99, 179, 237, 0.3);
-  color: var(--accent-blue);
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.missionBadge {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  color: var(--accent-purple);
-  background: rgba(139, 92, 246, 0.15);
-  border-radius: 8px;
-  padding: 3px 8px;
-}
-
-.missionCard {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  transition: filter 0.15s;
-}
-
-.missionCard:hover {
-  filter: brightness(1.08);
-}
-
-.missionEmoji {
-  font-size: 2rem;
-  flex-shrink: 0;
-}
-
-.missionContent {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.missionTitle {
-  font-size: 0.9375rem;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.missionDesc {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-.missionArrow {
-  color: var(--text-muted);
-  flex-shrink: 0;
-}
-
-.ctaSection {
-  margin: -4px 0;
-}
-
-.rankBadge {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--accent-purple);
-  background: rgba(139, 92, 246, 0.15);
-  border-radius: 8px;
-  padding: 3px 8px;
-}
-
-.emptyFeed {
-  padding: 16px 0;
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 0.8rem;
-}
-
-/* Comeback & milestone banners */
-.comebackBanner {
-  background: rgba(251, 191, 36, 0.12);
-  border: 1px solid rgba(251, 191, 36, 0.35);
-  border-radius: 14px;
-  padding: 12px 16px;
-  font-size: 0.85rem;
-  color: #fbbf24;
-  line-height: 1.4;
-}
-
-.milestoneBanner {
-  background: rgba(132, 204, 22, 0.12);
-  border: 1px solid rgba(132, 204, 22, 0.35);
-  border-radius: 14px;
-  padding: 12px 16px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--accent-lime);
-  text-align: center;
-}
-
-/* 7-day dots */
-.weekDots {
-  display: flex;
-  gap: 8px;
-  margin-top: 16px;
-  justify-content: center;
-}
-
-.dayDot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.dotActive {
-  background: var(--accent-lime);
-  border-color: var(--accent-lime);
-  box-shadow: 0 0 6px var(--accent-lime-glow);
-}
-
-.dayNum {
-  font-size: 0.6rem;
-  color: var(--text-muted);
-}
-
-/* Stats row */
-.statsRow {
-  display: flex;
-  align-items: center;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 16px 0;
-}
-
-.statItem {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.statNum {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  line-height: 1;
-}
-
-.statLabel {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-/* Format stats row */
-.formatStatsRow {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 2px;
-  scrollbar-width: none;
-}
-
-.formatStatsRow::-webkit-scrollbar { display: none; }
-
-.formatStatPill {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 6px 12px;
-  flex-shrink: 0;
-}
-
-.formatStatCount {
-  font-size: 0.9rem;
-  font-weight: 800;
-  color: var(--text-primary);
-}
-
-.formatStatLabel {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.statDivider {
-  width: 1px;
-  height: 32px;
-  background: var(--border-color);
-  flex-shrink: 0;
 }

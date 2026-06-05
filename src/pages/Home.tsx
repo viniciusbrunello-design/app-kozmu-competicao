@@ -1,75 +1,95 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Flame, TrendingUp, Plus, Trophy, MessageCircle, Shield, Zap, Target } from 'lucide-react';
-import { SkeletonActivityItem } from '../components/ui/Skeleton';
+import { Plus, Trophy, Zap, Shield, ChevronRight } from 'lucide-react';
 import { Header } from '../components/ui/Header';
 import { Card } from '../components/ui/Card';
 import { ProgressBar } from '../components/ui/ProgressBar';
 import { Avatar } from '../components/ui/Avatar';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
-import { getMyRank } from '../services/ranking.service';
-import type { ActivityEntry } from '../services/groups.service';
-import type { UserGoal } from '../services/goals.service';
 import { api } from '../services/api';
+import type { UserGoal } from '../services/goals.service';
 import styles from './Home.module.css';
 
-function timeAgo(date: string): string {
-  const diff = Date.now() - new Date(date).getTime();
-  const h = Math.floor(diff / 3600000);
-  const m = Math.floor(diff / 60000);
-  if (h > 0) return `${h}h`;
-  if (m > 0) return `${m}m`;
-  return 'agora';
-}
-
-function greeting(): string {
-  const h = new Date().getHours();
-  if (h < 12) return 'Bom dia,';
-  if (h < 18) return 'Boa tarde,';
-  return 'Boa noite,';
-}
-
-function activityLabel(type: string, data: Record<string, unknown>): string {
-  switch (type) {
-    case 'post_submitted':
-    case 'post_validated':
-      return `Registrou um ${String(data.format ?? 'post')} (+${data.points ?? 0} pts)`;
-    case 'streak_extended':
-      return `🔥 ${data.currentStreak} dias no streak`;
-    case 'streak_milestone':
-      return `🔥 ${data.currentStreak} dias de streak!`;
-    case 'rank_up':
-      return 'Subiu no ranking! 📈';
-    case 'goal_completed':
-      return '🏆 Bateu a meta da semana!';
-    case 'challenge_completed':
-      return `Completou o desafio "${data.challengeTitle ?? ''}"! 🎯`;
-    case 'group_joined':
-      return `Entrou no grupo "${data.groupName ?? ''}"`;
-    default:
-      return type;
-  }
-}
-
-const MOTIVATIONAL_PHRASES = [
-  'Crie mais. Consuma menos.',
-  'Consistência supera perfeição.',
-  'O melhor momento para publicar era ontem. O segundo melhor é agora.',
-  'Cada post é um passo à frente da sua versão de ontem.',
-  'Não espere a inspiração. Crie o hábito.',
-  'Você não precisa ser perfeito — precisa ser consistente.',
-  'Seu público está esperando por você.',
-];
-
-function getDailyPhrase(): string {
+// --------------- Calendar ---------------
+function MiniCalendar({ heatmap }: { heatmap: { date: string; count: number }[] }) {
   const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 0);
-  const day = Math.floor((now.getTime() - start.getTime()) / 86400000);
-  return MOTIVATIONAL_PHRASES[day % MOTIVATIONAL_PHRASES.length];
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay();
+  const today = now.getDate();
+
+  const activeSet = new Set(heatmap.filter((d) => d.count > 0).map((d) => d.date));
+
+  const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+  const cells: (number | null)[] = [];
+  for (let i = 0; i < firstDay; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  const raw = now.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  const monthLabel = raw.charAt(0).toUpperCase() + raw.slice(1);
+
+  return (
+    <Card className={styles.calendar}>
+      <p className={styles.calendarTitle}>{monthLabel}</p>
+      <div className={styles.calendarGrid}>
+        {weekDays.map((w, i) => (
+          <div key={i} className={styles.calendarWeekDay}>{w}</div>
+        ))}
+        {cells.map((day, i) => {
+          if (day === null) return <div key={`e-${i}`} />;
+          const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          const isActive = activeSet.has(dateStr);
+          const isToday = day === today;
+          return (
+            <div
+              key={dateStr}
+              className={[
+                styles.calendarDay,
+                isActive ? styles.calendarDayActive : '',
+                isToday && !isActive ? styles.calendarDayToday : '',
+              ].filter(Boolean).join(' ')}
+            >
+              {day}
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  );
 }
 
-// Daily mission — seeded by day of year so everyone sees the same one
+// --------------- Types ---------------
+interface MyGroup {
+  id: string;
+  name: string;
+  emoji?: string;
+  currentCycleEnd: string;
+}
+
+interface CycleResult {
+  groupId: string;
+  groupName: string;
+  cycleEnd: string;
+  isEnded?: boolean;
+  podium: {
+    rank: number;
+    userId: string;
+    displayName: string;
+    username: string;
+    avatarUrl?: string;
+    league: string;
+    cyclePoints: number;
+  }[];
+  myRank: number;
+  myPoints: number;
+  totalMembers: number;
+}
+
+const RANK_MEDAL: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
+
+// --------------- Daily Mission ---------------
 const DAILY_MISSIONS = [
   { emoji: '🎬', title: 'Poste um Reel hoje', desc: 'Reels têm o maior alcance. Aproveite o algoritmo!', format: 'reel' },
   { emoji: '🖼️', title: 'Suba um Carrossel', desc: 'Carrosséis educam e engajam. Qual conhecimento você compartilha?', format: 'carousel' },
@@ -90,98 +110,56 @@ const PLATFORM_FORMATS: Record<string, string[]> = {
 
 function getDailyMission(platforms: string[] = []) {
   const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 0);
-  const dayOfYear = Math.floor((now.getTime() - start.getTime()) / 86400000);
-
+  const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
   if (platforms.length > 0) {
     const supported = new Set<string>();
-    for (const p of platforms) {
+    for (const p of platforms)
       for (const fmt of PLATFORM_FORMATS[p] ?? []) supported.add(fmt);
-    }
     const filtered = DAILY_MISSIONS.filter((m) => m.format === null || supported.has(m.format));
     const pool = filtered.length > 0 ? filtered : DAILY_MISSIONS;
     return pool[dayOfYear % pool.length];
   }
-
   return DAILY_MISSIONS[dayOfYear % DAILY_MISSIONS.length];
 }
 
-interface CycleResult {
-  groupId: string;
-  groupName: string;
-  cycleEnd: string;
-  isEnded?: boolean;
-  podium: { rank: number; userId: string; displayName: string; username: string; avatarUrl?: string; league: string; cyclePoints: number }[];
-  myRank: number;
-  myPoints: number;
-  totalMembers: number;
-}
-
-const RANK_MEDAL: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
-
-const FORMAT_EMOJI: Record<string, string> = {
-  reel: '🎬', carousel: '🖼️', feed: '📷', live: '🔴', linkedin: '💼', story: '⭕',
-};
-const FORMAT_LABEL: Record<string, string> = {
-  reel: 'Reels', carousel: 'Carrosseis', feed: 'Posts', live: 'Lives', linkedin: 'LinkedIn', story: 'Stories',
-};
-
+// --------------- Component ---------------
 export function Home() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [feed, setFeed] = useState<ActivityEntry[]>([]);
-  const [rank, setRank] = useState<{ rank: number; total: number } | null>(null);
+
   const [unreadCount, setUnreadCount] = useState(0);
-  const [loadingFeed, setLoadingFeed] = useState(true);
-  const [nudgedIds, setNudgedIds] = useState<Set<string>>(new Set());
   const [cycleModal, setCycleModal] = useState<CycleResult | null>(null);
   const [heatmap, setHeatmap] = useState<{ date: string; count: number }[]>([]);
-  const [formatStats, setFormatStats] = useState<{ format: string; count: number }[]>([]);
   const [activeGoal, setActiveGoal] = useState<UserGoal | null>(null);
+  const [myGroups, setMyGroups] = useState<MyGroup[]>([]);
 
   useEffect(() => {
     Promise.all([
-      getUserFeed(20).then(setFeed).catch(() => {}),
-      getMyRank('weekly').then(setRank).catch(() => {}),
       api
         .get<{ notifications: unknown[]; unreadCount: number }>('/notifications?unread=true')
         .then((r) => setUnreadCount(r.unreadCount))
         .catch(() => {}),
       api.get<{ date: string; count: number }[]>('/users/me/heatmap').then(setHeatmap).catch(() => {}),
-      api.get<{ formatBreakdown: { format: string; count: number }[] }>('/users/me/stats')
-        .then((r) => setFormatStats(r.formatBreakdown))
+      api
+        .get<UserGoal[]>('/goals')
+        .then((goals) => setActiveGoal(goals.find((g) => g.isActive && !g.completed) ?? null))
         .catch(() => {}),
-      api.get<UserGoal[]>('/goals')
-        .then((goals) => {
-          const first = goals.find((g) => g.isActive && !g.completed);
-          setActiveGoal(first ?? null);
-        })
-        .catch(() => {}),
-    ]).finally(() => setLoadingFeed(false));
-
+      api.get<MyGroup[]>('/groups').then(setMyGroups).catch(() => {}),
+    ]);
     checkEndedCycles();
   }, []);
 
   async function checkEndedCycles() {
     try {
-      interface GroupSummary { id: string; currentCycleEnd: string }
-      const groups = await api.get<GroupSummary[]>('/groups');
+      const groups = await api.get<MyGroup[]>('/groups');
       const ended = groups.find((g) => new Date(g.currentCycleEnd) < new Date());
       if (!ended) return;
-
-      const sessionKey = `cycle_dismissed_${ended.id}_${ended.currentCycleEnd}`;
-      if (sessionStorage.getItem(sessionKey)) return;
-
+      const key = `cycle_dismissed_${ended.id}_${ended.currentCycleEnd}`;
+      if (sessionStorage.getItem(key)) return;
       const result = await api.get<CycleResult>(`/groups/${ended.id}/cycle-result`);
       if (result.isEnded) setCycleModal(result);
-    } catch { /* silently ignore */ }
+    } catch { /* ignore */ }
   }
-
-  const handleNudge = useCallback(async (item: ActivityEntry) => {
-    if (!item.groupId) return;
-    setNudgedIds((prev) => new Set(prev).add(item.userId));
-    api.post(`/groups/${item.groupId}/nudge/${item.userId}`).catch(() => {});
-  }, []);
 
   function dismissCycleModal() {
     if (!cycleModal) return;
@@ -189,214 +167,153 @@ export function Home() {
     setCycleModal(null);
   }
 
+  function daysRemaining(cycleEnd: string): number {
+    return Math.max(0, Math.ceil((new Date(cycleEnd).getTime() - Date.now()) / 86400000));
+  }
+
+  // Derived values
   const streak = user?.streak;
+  const currentStreak = streak?.currentStreak ?? 0;
+  const bestStreak = streak?.bestStreak ?? 0;
   const weeklyCount = streak?.weeklyCount ?? 0;
   const weeklyTarget = streak?.weeklyTarget ?? 5;
   const weeklyProgress = Math.min(100, Math.round((weeklyCount / weeklyTarget) * 100));
   const shields = (streak as { catchUpTokens?: number } | undefined)?.catchUpTokens ?? 0;
-  const dailyMission = getDailyMission(user?.platforms ?? []);
-  const currentStreak = streak?.currentStreak ?? 0;
+  const totalPosts = user?.stats?.submissionCount ?? 0;
 
-  // Heatmap-derived metrics
-  const last7Days = heatmap.slice(-7);
   const last30Days = heatmap.slice(-30);
-  const activeDays = heatmap.filter((d) => d.count > 0).length;
   const consistency = last30Days.length
     ? Math.round((last30Days.filter((d) => d.count > 0).length / last30Days.length) * 100)
     : 0;
-  const totalPosts = user?.stats?.submissionCount ?? 0;
 
-  // Show comeback nudge if 3+ days with no posts and no active streak
+  const MILESTONES: Record<number, string> = {
+    7: '7 dias consecutivos! Uma semana de constância.',
+    14: '14 dias! Duas semanas sem parar — incrível!',
+    21: '21 dias! Você criou um hábito de verdade!',
+    30: '30 dias! Um mês de consistência. Lendário!',
+    60: '60 dias! Você é uma máquina de conteúdo!',
+    100: '100 dias!! Você está em órbita, criador(a)!',
+  };
+  const milestoneMsg = MILESTONES[currentStreak] ?? null;
+  const isNewRecord = currentStreak > 1 && currentStreak === bestStreak;
   const last3Empty = heatmap.length >= 3 && heatmap.slice(-3).every((d) => d.count === 0);
   const showComeback = last3Empty && currentStreak === 0 && heatmap.length > 0;
 
-  // Milestone messages
-  const MILESTONES: Record<number, string> = {
-    7: '🎉 7 dias consecutivos! Uma semana de constância!',
-    14: '🔥 14 dias! Duas semanas sem parar — incrível!',
-    21: '⚡ 21 dias! Você criou um hábito de verdade!',
-    30: '🚀 30 dias! Um mês de consistência. Lendário!',
-    60: '💎 60 dias! Você é uma máquina de conteúdo!',
-    100: '🌌 100 dias!! Você está em órbita, criador(a)!',
-  };
-  const milestoneMsg = MILESTONES[currentStreak] ?? null;
-  const isNewRecord = currentStreak > 1 && currentStreak === (streak?.bestStreak ?? 0);
-  const motivationalPhrase = getDailyPhrase();
+  const firstName = user?.displayName?.split(' ')[0] ?? user?.username ?? '...';
+  const dailyMission = getDailyMission(user?.platforms ?? []);
+
+  // Achievement banner priority: milestone > comeback > new record
+  const achievement = milestoneMsg
+    ? { icon: '🏅', title: 'Você desbloqueou um selo!', desc: milestoneMsg }
+    : showComeback
+    ? { icon: '👋', title: 'Está sumido!', desc: 'Faz alguns dias sem publicar. Volte à órbita — seu público está esperando!' }
+    : isNewRecord
+    ? { icon: '⭐', title: 'Novo recorde pessoal!', desc: `${currentStreak} dias consecutivos — você está no seu melhor streak de todos os tempos!` }
+    : streak?.atRisk
+    ? { icon: '⚠️', title: 'Streak em risco!', desc: 'Publique hoje para não perder seu streak.' }
+    : null;
 
   return (
     <>
-      <Header title="Kozmu" showNotifications hasUnreadNotif={unreadCount > 0} showSettings />
+      <Header showNotifications hasUnreadNotif={unreadCount > 0} showSettings />
 
       <div className="page-content">
         <div className={styles.home}>
 
           {/* Greeting */}
-          <div className={styles.welcome}>
-            <div className={styles.greeting}>
-              <span>{greeting()}</span>
-              <h2>@{user?.username ?? '...'}</h2>
-            </div>
-            <Avatar alt={user?.displayName ?? ''} size="md" status={streak?.atRisk ? 'danger' : 'active'} />
+          <div className={styles.greetingRow}>
+            <h1 className={styles.greeting}>Olá, {firstName} 👋</h1>
+            <Avatar
+              alt={user?.displayName ?? ''}
+              size="md"
+              fallback={(user?.displayName ?? '??').slice(0, 2).toUpperCase()}
+              src={user?.avatarUrl}
+              status={streak?.atRisk ? 'danger' : currentStreak > 0 ? 'active' : undefined}
+            />
           </div>
-
-          {/* Frase motivacional */}
-          <p className={styles.motivationalPhrase}>"{motivationalPhrase}"</p>
-
-          {/* Novo recorde de streak */}
-          {isNewRecord && !milestoneMsg && (
-            <div className={styles.recordBanner}>
-              ⭐ Você está no seu recorde pessoal de streak! Continue assim!
-            </div>
-          )}
-
-          {/* Comeback nudge */}
-          {showComeback && (
-            <div className={styles.comebackBanner}>
-              👋 Faz alguns dias que você não publica. Volte à órbita — seu público está esperando!
-            </div>
-          )}
-
-          {/* Milestone banner */}
-          {milestoneMsg && !showComeback && (
-            <div className={styles.milestoneBanner}>{milestoneMsg}</div>
-          )}
 
           {/* Streak card */}
-          <Card variant="glass" glow="lime" className={styles.streakCard}>
-            <Flame size={48} className={styles.fireIcon} />
-            <div className={styles.streakTitle}>Streak Atual</div>
-            <div className={styles.streakValue}>{currentStreak}</div>
-            <div className={styles.streakSub}>
-              {streak?.atRisk
-                ? '⚠️ Publique hoje para não perder o streak!'
-                : currentStreak >= 30
-                ? 'dias — lendário! 🌌'
-                : currentStreak >= 7
-                ? 'dias consecutivos — continue assim! 🔥'
-                : currentStreak > 0
-                ? 'dias consecutivos publicando!'
-                : 'Publique agora para iniciar seu streak!'}
-            </div>
-
-            {/* Last 7 days dots */}
-            {last7Days.length > 0 && (
-              <div className={styles.weekDots}>
-                {last7Days.map(({ date, count }) => {
-                  const day = new Date(date + 'T12:00:00').getDate();
-                  return (
-                    <div key={date} className={styles.dayDot}>
-                      <div className={`${styles.dot} ${count > 0 ? styles.dotActive : ''}`} />
-                      <span className={styles.dayNum}>{day}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {shields > 0 && (
-              <div className={styles.shieldBadge}>
-                <Shield size={13} />
-                <span>{shields} escudo{shields > 1 ? 's' : ''} disponível{shields > 1 ? 'is' : ''}</span>
-              </div>
-            )}
-          </Card>
-
-          {/* Stats row */}
-          <div className={styles.statsRow}>
-            <div className={styles.statItem}>
-              <span className={styles.statNum}>{totalPosts}</span>
-              <span className={styles.statLabel}>Check-ins</span>
-            </div>
-            <div className={styles.statDivider} />
-            <div className={styles.statItem}>
-              <span className={styles.statNum}>{activeDays}</span>
-              <span className={styles.statLabel}>Dias ativos</span>
-            </div>
-            <div className={styles.statDivider} />
-            <div className={styles.statItem}>
-              <span className={styles.statNum} style={{ color: consistency >= 70 ? 'var(--accent-lime)' : consistency >= 40 ? 'var(--accent-blue)' : 'var(--text-primary)' }}>
-                {consistency}%
+          <div className={styles.streakCard}>
+            <div className={styles.streakLeft}>
+              <span className={styles.streakNumber}>{currentStreak}</span>
+              <span className={styles.streakSubLabel}>
+                dias consecutivos 🔥
               </span>
-              <span className={styles.statLabel}>Constância</span>
-            </div>
-          </div>
-
-          {/* Format breakdown */}
-          {formatStats.length > 0 && (
-            <div className={styles.formatStatsRow}>
-              {formatStats.map(({ format, count }) => (
-                <div key={format} className={styles.formatStatPill}>
-                  <span>{FORMAT_EMOJI[format] ?? '📝'}</span>
-                  <span className={styles.formatStatCount}>{count}</span>
-                  <span className={styles.formatStatLabel}>{FORMAT_LABEL[format] ?? format}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Weekly goal */}
-          <div className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <h3 className={styles.sectionTitle}>Meta Semanal</h3>
-              {rank && (
-                <span className={styles.rankBadge}>
-                  <TrendingUp size={12} /> #{rank.rank}
+              {shields > 0 && (
+                <span className={styles.shieldTag}>
+                  <Shield size={11} /> {shields} escudo{shields > 1 ? 's' : ''}
                 </span>
               )}
             </div>
-            <Card>
-              <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                  {weeklyCount >= weeklyTarget
-                    ? '🎉 Meta batida! +1 escudo ganho'
-                    : weeklyCount >= weeklyTarget - 1
-                    ? `Só mais 1 post para fechar! 💪`
-                    : `Faltam ${weeklyTarget - weeklyCount} posts para fechar`}
-                </span>
-                <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--accent-lime)' }}>
-                  {weeklyCount}/{weeklyTarget}
-                </span>
-              </div>
-              <ProgressBar progress={weeklyProgress} label="Progresso" color="blue" />
+            <div className={styles.streakSep} />
+            <div className={styles.streakRight}>
+              <span className={styles.recordLabel}>recorde pessoal</span>
+              <span className={styles.recordValue}>{bestStreak} dias</span>
+              {isNewRecord && (
+                <span className={styles.newRecordTag}>⭐ novo!</span>
+              )}
+            </div>
+          </div>
+
+          {/* Stats grid — 2 cards */}
+          <div className={styles.statsGrid}>
+            <Card className={styles.statCard}>
+              <span className={styles.statNumber}>{totalPosts}</span>
+              <span className={styles.statCaption}>check-ins totais</span>
+            </Card>
+            <Card className={styles.statCard}>
+              <span
+                className={styles.statNumber}
+                style={{ color: consistency >= 70 ? 'var(--accent-lime)' : 'var(--text-primary)' }}
+              >
+                {consistency}%
+              </span>
+              <span className={styles.statCaption}>constância (30d)</span>
             </Card>
           </div>
 
-          {/* Meta pessoal ativa */}
-          {activeGoal && (
-            <div className={styles.section}>
-              <div className={styles.sectionHeader}>
-                <h3 className={styles.sectionTitle}>Meta Ativa</h3>
-                <a
-                  href="#"
-                  className={styles.seeAll}
-                  onClick={(e) => { e.preventDefault(); navigate('/metas'); }}
-                >
-                  Ver todas
-                </a>
+          {/* Monthly calendar */}
+          {heatmap.length > 0 && <MiniCalendar heatmap={heatmap} />}
+
+          {/* Achievement / notification banner */}
+          {achievement && (
+            <div className={styles.achievementBanner}>
+              <span className={styles.achievementIcon}>{achievement.icon}</span>
+              <div className={styles.achievementText}>
+                <span className={styles.achievementTitle}>{achievement.title}</span>
+                <span className={styles.achievementDesc}>{achievement.desc}</span>
               </div>
-              <Card onClick={() => navigate('/metas')} style={{ cursor: 'pointer' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                  <Target size={15} style={{ color: 'var(--accent-purple)', flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                    {activeGoal.title}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 8 }}>
-                  <span>{activeGoal.progress}/{activeGoal.targetCount} posts</span>
-                  <span style={{ fontWeight: 700, color: 'var(--accent-purple)' }}>{activeGoal.percentage}%</span>
-                </div>
-                <ProgressBar progress={activeGoal.percentage} color="purple" size="sm" showValue={false} />
+            </div>
+          )}
+
+          {/* Meus Grupos */}
+          {myGroups.length > 0 && (
+            <div className={styles.section}>
+              <p className={styles.sectionLabel}>MEUS GRUPOS</p>
+              <Card>
+                {myGroups.map((g, i) => (
+                  <button
+                    key={g.id}
+                    className={`${styles.groupRow} ${i < myGroups.length - 1 ? styles.groupRowBorder : ''}`}
+                    onClick={() => navigate(`/grupos/${g.id}`)}
+                  >
+                    <span className={styles.groupEmoji}>{g.emoji || '🏆'}</span>
+                    <div className={styles.groupInfo}>
+                      <span className={styles.groupName}>{g.name}</span>
+                      <span className={styles.groupSub}>{daysRemaining(g.currentCycleEnd)} dias restantes</span>
+                    </div>
+                    <ChevronRight size={16} className={styles.groupChevron} />
+                  </button>
+                ))}
               </Card>
             </div>
           )}
 
-          {/* Daily mission */}
+          {/* Missão do Dia */}
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <h3 className={styles.sectionTitle}>Missão do Dia</h3>
-              <span className={styles.missionBadge}>
-                <Zap size={11} /> Hoje
-              </span>
+              <span className={styles.missionBadge}><Zap size={11} /> Hoje</span>
             </div>
             <Card
               variant="glass"
@@ -413,79 +330,37 @@ export function Home() {
             </Card>
           </div>
 
-          {/* CTA */}
-          <div className={styles.ctaSection}>
-            <Button variant="primary" fullWidth icon={<Plus size={18} />} onClick={() => navigate('/registrar')}>
-              Registrar Publicação
-            </Button>
-          </div>
-
-          {/* Group activity */}
-          <div className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <h3 className={styles.sectionTitle}>Atividade do Grupo</h3>
-              <a
-                href="#"
-                className={styles.seeAll}
-                onClick={(e) => { e.preventDefault(); navigate('/grupos'); }}
-              >
-                Ver tudo
-              </a>
+          {/* Meta Semanal (compact) */}
+          <Card>
+            <div className={styles.weeklyRow}>
+              <span className={styles.weeklyLabel}>Meta Semanal</span>
+              <span className={styles.weeklyCount}>{weeklyCount}/{weeklyTarget}</span>
             </div>
+            <ProgressBar progress={weeklyProgress} color="blue" size="sm" showValue={false} />
+            <p className={styles.weeklyHint}>
+              {weeklyCount >= weeklyTarget
+                ? '🎉 Meta batida! +1 escudo ganho'
+                : `Faltam ${weeklyTarget - weeklyCount} posts para fechar a semana`}
+            </p>
+          </Card>
 
-            <Card>
-              {loadingFeed ? (
-                <>{[0, 1, 2].map((i) => <SkeletonActivityItem key={i} />)}</>
-              ) : feed.length === 0 ? (
-                <div className={styles.emptyFeed}>
-                  Seu grupo ainda está quieto. Seja o primeiro a publicar hoje! 🚀
-                </div>
-              ) : (
-                feed.filter((item) => item.type !== 'post_submitted').slice(0, 5).map((item) => {
-                  const isMe = item.userId === user?.id;
-                  const nudged = nudgedIds.has(item.userId);
-                  return (
-                    <div key={item.id} className={styles.activityItem}>
-                      <Avatar
-                        alt={item.user.displayName}
-                        size="sm"
-                        fallback={item.user.displayName.slice(0, 2).toUpperCase()}
-                        src={item.user.avatarUrl}
-                        onClick={() => navigate(`/perfil/${item.user.username}`)}
-                        style={{ cursor: 'pointer' }}
-                      />
-                      <div className={styles.activityContent}>
-                        <button
-                          className={styles.activityUser}
-                          onClick={() => navigate(`/perfil/${item.user.username}`)}
-                          style={{ background: 'none', border: 'none', font: 'inherit', padding: 0, cursor: 'pointer', textAlign: 'left' }}
-                        >
-                          {item.user.displayName}
-                        </button>
-                        <span className={styles.activityAction}>
-                          {activityLabel(item.type, item.data)}
-                        </span>
-                      </div>
-                      <div className={styles.activityRight}>
-                        <span className={styles.activityTime}>{timeAgo(item.createdAt)}</span>
-                        {!isMe && item.groupId && (
-                          <button
-                            className={`${styles.nudgeBtn} ${nudged ? styles.nudgeDone : ''}`}
-                            onClick={() => handleNudge(item)}
-                            disabled={nudged}
-                            title={nudged ? 'Cobrado! 💪' : 'Cobrar para publicar'}
-                            aria-label="Cobrar"
-                          >
-                            <MessageCircle size={14} />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })
-              )}
+          {/* Meta pessoal ativa */}
+          {activeGoal && (
+            <Card onClick={() => navigate('/metas')} style={{ cursor: 'pointer' }}>
+              <div className={styles.weeklyRow}>
+                <span className={styles.weeklyLabel}>{activeGoal.title}</span>
+                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-purple)' }}>
+                  {activeGoal.percentage}%
+                </span>
+              </div>
+              <ProgressBar progress={activeGoal.percentage} color="purple" size="sm" showValue={false} />
             </Card>
-          </div>
+          )}
+
+          {/* CTA */}
+          <Button variant="primary" fullWidth icon={<Plus size={18} />} onClick={() => navigate('/registrar')}>
+            Registrar Publicação
+          </Button>
 
         </div>
       </div>
@@ -499,10 +374,12 @@ export function Home() {
               <h2 className={styles.cycleModalTitle}>Ciclo Encerrado!</h2>
               <p className={styles.cycleModalGroup}>{cycleModal.groupName}</p>
             </div>
-
             <div className={styles.cyclePodium}>
               {cycleModal.podium.map((entry) => (
-                <div key={entry.userId} className={`${styles.cyclePodiumItem} ${entry.rank === 1 ? styles.cyclePodiumFirst : ''}`}>
+                <div
+                  key={entry.userId}
+                  className={`${styles.cyclePodiumItem} ${entry.rank === 1 ? styles.cyclePodiumFirst : ''}`}
+                >
                   <span className={styles.cycleMedal}>{RANK_MEDAL[entry.rank]}</span>
                   <Avatar
                     alt={entry.displayName}
@@ -515,14 +392,12 @@ export function Home() {
                 </div>
               ))}
             </div>
-
             {cycleModal.myRank > 0 && (
               <div className={styles.cycleMyResult}>
                 Você ficou em <strong>#{cycleModal.myRank}</strong> com{' '}
                 <strong style={{ color: 'var(--accent-lime)' }}>{cycleModal.myPoints} pts</strong>
               </div>
             )}
-
             <Button variant="primary" fullWidth onClick={dismissCycleModal}>
               Bora pro próximo ciclo! 🚀
             </Button>
@@ -531,8 +406,4 @@ export function Home() {
       )}
     </>
   );
-}
-
-async function getUserFeed(limit: number): Promise<ActivityEntry[]> {
-  return api.get<ActivityEntry[]>(`/activity?limit=${limit}`);
 }
