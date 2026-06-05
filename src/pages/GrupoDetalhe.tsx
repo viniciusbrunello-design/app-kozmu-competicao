@@ -191,7 +191,7 @@ export function GrupoDetalhe() {
     if (!id) return;
     if (!confirm('Remover este membro do grupo?')) return;
     try {
-      await api.delete(`/groups/${id}/members/${targetUserId}`);
+      await api.del(`/groups/${id}/members/${targetUserId}`);
       setRanking((prev) => prev.filter((r) => r.userId !== targetUserId));
       getGroupDetails(id).then(setGroup).catch(() => {});
     } catch (err) {
@@ -504,7 +504,7 @@ export function GrupoDetalhe() {
                       </span>
                       <span className={styles.postPoints}>+{String(item.data.points)} pts</span>
                     </div>
-                    {item.data.url && (
+                    {item.data.url ? (
                       <a
                         href={String(item.data.url)}
                         target="_blank"
@@ -514,7 +514,7 @@ export function GrupoDetalhe() {
                       >
                         {formatUrlDisplay(String(item.data.url))}
                       </a>
-                    )}
+                    ) : null}
                   </div>
                 ) : (
                   <div key={item.id} className={styles.activityRow}>

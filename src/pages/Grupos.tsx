@@ -6,7 +6,7 @@ import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Avatar } from '../components/ui/Avatar';
 import * as groupsService from '../services/groups.service';
-import type { Group, PublicGroup } from '../services/groups.service';
+import type { Group } from '../services/groups.service';
 import styles from './Grupos.module.css';
 
 const LEAGUE_LABELS: Record<string, string> = {
@@ -20,9 +20,6 @@ const CYCLE_OPTIONS = [
   { label: '30 dias', value: 'monthly' },
 ];
 
-const CYCLE_LABELS: Record<string, string> = {
-  weekly: '7d', biweekly: '14d', monthly: '30d',
-};
 
 export function Grupos() {
   const navigate = useNavigate();

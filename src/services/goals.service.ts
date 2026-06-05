@@ -28,5 +28,5 @@ export async function createGoal(data: {
 }
 
 export async function deleteGoal(id: string): Promise<void> {
-  await api.delete(`/goals/${id}`);
+  await api.del(`/goals/${id}`);
 }
