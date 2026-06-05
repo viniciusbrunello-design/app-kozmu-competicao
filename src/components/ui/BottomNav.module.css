@@ -37,19 +37,22 @@
   align-items: center;
   gap: 3px;
   color: var(--text-muted);
-  text-decoration: none;
+  background: none;
+  border: none;
+  font-family: inherit;
   font-size: 0.6875rem;
   font-weight: 500;
-  transition: color 0.2s;
+  cursor: pointer;
   padding: 6px 10px;
   border-radius: 12px;
+  transition: color 0.15s;
 }
 
 .item:hover {
   color: var(--text-secondary);
 }
 
-.active {
+.item.active {
   color: var(--accent-lime);
 }
 
@@ -60,7 +63,7 @@
   justify-content: center;
 }
 
-.active .iconWrapper {
+.item.active .iconWrapper {
   filter: drop-shadow(0 0 8px var(--accent-lime-glow));
 }
 

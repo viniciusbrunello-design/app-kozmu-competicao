@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import clsx from 'clsx';
 import { Home, Compass, Users, User, Plus } from 'lucide-react';
 import styles from './BottomNav.module.css';
@@ -13,8 +13,31 @@ const RIGHT_ITEMS = [
   { to: '/perfil', icon: User,  label: 'Perfil', end: false },
 ];
 
+function isPathActive(pathname: string, to: string, end: boolean): boolean {
+  if (end) return pathname === to;
+  return pathname === to || pathname.startsWith(to + '/');
+}
+
 export function BottomNav() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  function NavItem({ to, icon: Icon, label, end }: { to: string; icon: React.ElementType; label: string; end: boolean }) {
+    const active = isPathActive(pathname, to, end);
+    return (
+      <button
+        className={clsx(styles.item, active && styles.active)}
+        onClick={() => navigate(to)}
+        aria-label={label}
+        aria-current={active ? 'page' : undefined}
+      >
+        <div className={styles.iconWrapper}>
+          <Icon size={22} />
+        </div>
+        <span>{label}</span>
+      </button>
+    );
+  }
 
   return (
     <nav className={styles.nav}>
@@ -22,17 +45,7 @@ export function BottomNav() {
 
         <div className={styles.side}>
           {LEFT_ITEMS.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) => clsx(styles.item, isActive && styles.active)}
-            >
-              <div className={styles.iconWrapper}>
-                <item.icon size={22} />
-              </div>
-              <span>{item.label}</span>
-            </NavLink>
+            <NavItem key={item.to} {...item} />
           ))}
         </div>
 
@@ -46,17 +59,7 @@ export function BottomNav() {
 
         <div className={styles.side}>
           {RIGHT_ITEMS.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) => clsx(styles.item, isActive && styles.active)}
-            >
-              <div className={styles.iconWrapper}>
-                <item.icon size={22} />
-              </div>
-              <span>{item.label}</span>
-            </NavLink>
+            <NavItem key={item.to} {...item} />
           ))}
         </div>
 

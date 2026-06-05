@@ -272,8 +272,8 @@ export function Home() {
             </Card>
           </div>
 
-          {/* Monthly calendar */}
-          {heatmap.length > 0 && <MiniCalendar heatmap={heatmap} />}
+          {/* Monthly calendar — sempre visível, dias ativos preenchidos quando heatmap carrega */}
+          <MiniCalendar heatmap={heatmap} />
 
           {/* Achievement / notification banner */}
           {achievement && (
