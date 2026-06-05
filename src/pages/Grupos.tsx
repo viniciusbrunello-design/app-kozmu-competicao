@@ -107,7 +107,7 @@ export function Grupos() {
 
   return (
     <>
-      <Header title="Grupos" showNotifications />
+      <Header title="Grupos" showNotifications showSettings />
       <div className="page-content">
         <div className={styles.page}>
 

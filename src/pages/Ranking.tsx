@@ -32,7 +32,7 @@ export function Ranking() {
 
   return (
     <>
-      <Header title="Ranking" showNotifications />
+      <Header title="Ranking" showNotifications showSettings />
       <div className="page-content">
         <div className={styles.page}>
 

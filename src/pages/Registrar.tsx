@@ -176,7 +176,7 @@ export function Registrar() {
 
   return (
     <>
-      <Header title="Registrar Prova" />
+      <Header title="Registrar Prova" showNotifications showSettings />
       <div className="page-content" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
         <Card glow="purple">

@@ -46,7 +46,7 @@ export function Feed() {
 
   return (
     <>
-      <Header title="Descobrir" showNotifications />
+      <Header title="Descobrir" showNotifications showSettings />
       <div className="page-content">
         <div className={styles.page}>
 

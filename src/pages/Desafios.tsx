@@ -78,7 +78,7 @@ export function Desafios() {
 
   return (
     <>
-      <Header title="Desafios" showNotifications />
+      <Header title="Desafios" showNotifications showSettings />
       <div className="page-content">
         <div className={styles.page}>
 
