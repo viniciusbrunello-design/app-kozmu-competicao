@@ -257,11 +257,11 @@ export function Home() {
 
           {/* Stats grid — 2 cards */}
           <div className={styles.statsGrid}>
-            <Card className={styles.statCard}>
+            <div className={styles.statCard}>
               <span className={styles.statNumber}>{totalPosts}</span>
               <span className={styles.statCaption}>check-ins totais</span>
-            </Card>
-            <Card className={styles.statCard}>
+            </div>
+            <div className={styles.statCard}>
               <span
                 className={styles.statNumber}
                 style={{ color: consistency >= 70 ? 'var(--accent-lime)' : 'var(--text-primary)' }}
@@ -269,7 +269,7 @@ export function Home() {
                 {consistency}%
               </span>
               <span className={styles.statCaption}>constância (30d)</span>
-            </Card>
+            </div>
           </div>
 
           {/* Monthly calendar — sempre visível, dias ativos preenchidos quando heatmap carrega */}

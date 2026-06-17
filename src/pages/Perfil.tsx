@@ -100,7 +100,8 @@ export function Perfil() {
               <div className={styles.platforms}>
                 {user.platforms.map((p: string) => (
                   <span key={p} className={styles.platform}>
-                    {platformIcons[p] ?? '🌐'} {p}
+                    <span>{platformIcons[p] ?? '🌐'}</span>
+                    <span>{p}</span>
                   </span>
                 ))}
               </div>

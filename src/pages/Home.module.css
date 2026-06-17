@@ -35,7 +35,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.3em;
 }
 
 .streakNumber {
@@ -77,7 +77,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 6px;
+  gap: 0.4em;
 }
 
 .recordLabel {
@@ -112,13 +112,16 @@
 }
 
 .statCard {
+  background: var(--bg-surface);
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 18px 12px !important;
-  gap: 10px;
+  padding: 18px 12px;
+  gap: 0.5em;
 }
 
 .statNumber {
@@ -285,7 +288,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.25em;
 }
 
 .groupName {
@@ -335,7 +338,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 0.3em;
 }
 
 .missionTitle {
