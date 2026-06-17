@@ -9,7 +9,7 @@
   border-radius: 12px;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: opacity 0.15s, box-shadow 0.15s;
   padding: 12px 24px;
   text-decoration: none;
 }
@@ -19,43 +19,41 @@
 }
 
 .button:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
   transform: none;
 }
 
 /* Variants */
 .primary {
-  background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+  background: var(--accent-purple);
   color: #fff;
-  box-shadow: 0 4px 15px var(--accent-purple-glow);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.28);
 }
 
 .primary:hover:not(:disabled) {
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
-  filter: brightness(1.1);
+  opacity: 0.88;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.38);
 }
 
 .secondary {
-  background: var(--bg-surface-elevated);
+  background: rgba(60, 60, 67, 0.08);
   color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  border: none;
 }
 
 .secondary:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: var(--border-highlight);
+  background: rgba(60, 60, 67, 0.13);
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(60, 60, 67, 0.06);
   color: var(--text-primary);
-  backdrop-filter: blur(10px);
   border: 1px solid var(--border-color);
 }
 
 .glass:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(60, 60, 67, 0.1);
 }
 
 .ghost {
@@ -65,14 +63,14 @@
 
 .ghost:hover:not(:disabled) {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(60, 60, 67, 0.06);
 }
 
 /* Sizes */
 .sm {
   padding: 8px 16px;
   font-size: 0.875rem;
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 .md {
@@ -81,7 +79,7 @@
 
 .lg {
   padding: 16px 32px;
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
   border-radius: 14px;
 }
 

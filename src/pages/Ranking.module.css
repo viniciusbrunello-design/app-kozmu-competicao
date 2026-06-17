@@ -27,8 +27,9 @@
 }
 
 .tab.tabActive {
-  background: var(--accent-purple);
-  color: white;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 .myRankCard {
@@ -151,8 +152,8 @@
 }
 
 .listItem.listItemMe {
-  background: rgba(139, 92, 246, 0.1);
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.18);
 }
 
 .listRank {

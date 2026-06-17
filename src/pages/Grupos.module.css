@@ -255,9 +255,10 @@
 }
 
 .tabBtnActive {
-  background: var(--bg-base);
+  background: var(--bg-surface);
   color: var(--text-primary);
   font-weight: 700;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 /* Public groups */

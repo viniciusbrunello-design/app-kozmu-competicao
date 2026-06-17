@@ -10,10 +10,10 @@ interface HeatMapProps {
 }
 
 function cellColor(count: number): string {
-  if (count === 0) return 'var(--bg-surface)';
-  if (count === 1) return 'rgba(163, 230, 53, 0.30)';
-  if (count === 2) return 'rgba(163, 230, 53, 0.55)';
-  if (count === 3) return 'rgba(163, 230, 53, 0.75)';
+  if (count === 0) return 'rgba(60, 60, 67, 0.1)';
+  if (count === 1) return 'rgba(52, 199, 89, 0.3)';
+  if (count === 2) return 'rgba(52, 199, 89, 0.55)';
+  if (count === 3) return 'rgba(52, 199, 89, 0.78)';
   return 'var(--accent-lime)';
 }
 
@@ -55,7 +55,7 @@ export function HeatMap({ data }: HeatMapProps) {
                   <div
                     key={di}
                     className={styles.cell}
-                    style={{ background: cell ? cellColor(cell.count) : 'transparent' }}
+                    style={{ background: cell ? cellColor(cell.count) : 'rgba(60, 60, 67, 0.05)' }}
                     title={cell ? `${cell.date}: ${cell.count} post${cell.count !== 1 ? 's' : ''}` : ''}
                   />
                 );

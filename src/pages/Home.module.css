@@ -21,13 +21,14 @@
 
 /* ---- Streak Card ---- */
 .streakCard {
-  background: var(--bg-base);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #1C1C1E;
+  border: none;
   border-radius: 20px;
   padding: 24px 20px;
   display: flex;
   align-items: center;
   gap: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .streakLeft {
@@ -40,13 +41,13 @@
 .streakNumber {
   font-size: 3.5rem;
   font-weight: 800;
-  color: var(--text-primary);
+  color: #FFFFFF;
   line-height: 1;
 }
 
 .streakSubLabel {
   font-size: 0.875rem;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .shieldTag {
@@ -56,9 +57,9 @@
   margin-top: 6px;
   padding: 3px 10px;
   border-radius: 99px;
-  background: rgba(99, 179, 237, 0.15);
-  border: 1px solid rgba(99, 179, 237, 0.25);
-  color: #63b3ed;
+  background: rgba(99, 179, 237, 0.2);
+  border: 1px solid rgba(99, 179, 237, 0.3);
+  color: #7EB8F0;
   font-size: 0.7rem;
   font-weight: 600;
   align-self: flex-start;
@@ -67,7 +68,7 @@
 .streakSep {
   width: 1px;
   height: 52px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
   margin: 0 20px;
   flex-shrink: 0;
 }
@@ -81,7 +82,7 @@
 
 .recordLabel {
   font-size: 0.6875rem;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.45);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-weight: 600;
@@ -90,14 +91,14 @@
 .recordValue {
   font-size: 1.375rem;
   font-weight: 800;
-  color: var(--text-primary);
+  color: #FFFFFF;
 }
 
 .newRecordTag {
   font-size: 0.6875rem;
   font-weight: 700;
-  color: #f59e0b;
-  background: rgba(245, 158, 11, 0.15);
+  color: #FFD60A;
+  background: rgba(255, 214, 10, 0.15);
   border-radius: 6px;
   padding: 2px 6px;
   margin-top: 4px;
@@ -172,8 +173,8 @@
 }
 
 .calendarDayActive {
-  background: var(--text-primary);
-  color: var(--bg-base);
+  background: #1C1C1E;
+  color: #FFFFFF;
   font-weight: 700;
   border-radius: 8px;
 }
