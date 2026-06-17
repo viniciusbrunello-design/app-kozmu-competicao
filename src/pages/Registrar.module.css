@@ -57,7 +57,7 @@
 
 .input:focus {
   border-color: var(--accent-purple);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
 .input::placeholder {
@@ -67,15 +67,15 @@
 .formatGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 10px;
 }
 
 .formatCard {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 12px 8px;
+  gap: 6px;
+  padding: 16px 8px;
   border-radius: 14px;
   background: var(--bg-base);
   border: 2px solid var(--border-color);
@@ -91,7 +91,7 @@
 
 .formatCard.formatActive {
   border-color: var(--accent-purple);
-  background: rgba(139, 92, 246, 0.1);
+  background: rgba(99, 102, 241, 0.08);
 }
 
 .formatBlocked {
@@ -167,7 +167,7 @@
 }
 
 .groupChipActive {
-  background: rgba(139, 92, 246, 0.15);
+  background: rgba(99, 102, 241, 0.12);
   border-color: var(--accent-purple);
   color: var(--accent-purple);
   font-weight: 700;

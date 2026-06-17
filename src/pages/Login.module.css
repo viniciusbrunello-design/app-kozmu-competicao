@@ -99,7 +99,7 @@
 
 .input:focus {
   border-color: var(--accent-purple);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
 .input::placeholder {

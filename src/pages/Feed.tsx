@@ -80,6 +80,9 @@ export function Feed() {
           {filtered.map((group) => (
             <Card key={group.id} variant="glass" className={styles.card}>
               <div className={styles.cardRow}>
+                <div className={styles.groupAvatar}>
+                  {group.name.charAt(0).toUpperCase()}
+                </div>
                 <div className={styles.cardInfo}>
                   <h3 className={styles.groupName}>{group.name}</h3>
                   {group.description && (

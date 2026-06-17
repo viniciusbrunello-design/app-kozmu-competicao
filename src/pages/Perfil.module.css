@@ -38,7 +38,7 @@
 .profileType {
   font-size: 0.7rem;
   color: var(--accent-purple);
-  background: rgba(139, 92, 246, 0.15);
+  background: rgba(99, 102, 241, 0.15);
   border-radius: 6px;
   padding: 2px 8px;
   align-self: flex-start;
@@ -77,10 +77,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  background: var(--bg-surface);
+  gap: 5px;
+  background: var(--bg-base);
   border-radius: 14px;
-  padding: 14px 8px;
+  padding: 14px 6px;
+  min-width: 0;
 }
 
 .statIcon {
@@ -88,7 +89,7 @@
 }
 
 .statValue {
-  font-size: 1.2rem;
+  font-size: 1.125rem;
   font-weight: 800;
   color: var(--text-primary);
   line-height: 1;
@@ -102,11 +103,12 @@
 }
 
 .statLabel {
-  font-size: 0.6rem;
-  color: var(--text-muted);
+  font-size: 0.625rem;
+  color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-align: center;
+  line-height: 1.2;
 }
 
 .leagueCard {

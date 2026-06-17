@@ -1,7 +1,7 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .actions {
@@ -27,7 +27,7 @@
 }
 
 .retryBtn:hover {
-  background: rgba(139, 92, 246, 0.1);
+  background: rgba(99, 102, 241, 0.1);
 }
 
 .empty {
@@ -44,7 +44,7 @@
 .groupCard {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .groupHeader {
@@ -78,8 +78,8 @@
   font-size: 0.7rem;
   font-weight: 700;
   color: var(--accent-purple);
-  background: rgba(139, 92, 246, 0.15);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
   border-radius: 6px;
   padding: 2px 8px;
   flex-shrink: 0;
@@ -94,36 +94,46 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   flex: 1;
   background: var(--bg-base);
-  border-radius: 10px;
-  padding: 8px 4px;
+  border-radius: 12px;
+  padding: 12px 8px;
+  min-width: 0;
 }
 
 .statValue {
-  font-size: 1.1rem;
+  font-size: 1.0625rem;
   font-weight: 800;
   color: var(--text-primary);
+  white-space: nowrap;
 }
 
 .statLabel {
-  font-size: 0.65rem;
-  color: var(--text-muted);
+  font-size: 0.6875rem;
+  color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
+  text-align: center;
+  line-height: 1.2;
 }
 
 .memberRanking {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
 }
 
 .memberRow {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.memberRow:last-child {
+  border-bottom: none;
 }
 
 .memberRank {
@@ -169,7 +179,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding-top: 8px;
+  padding-top: 12px;
   border-top: 1px solid var(--border-color);
 }
 
@@ -347,7 +357,7 @@
 }
 
 .typeActive {
-  background: rgba(139, 92, 246, 0.15);
+  background: rgba(99, 102, 241, 0.15);
   border-color: var(--accent-purple);
   color: var(--accent-purple);
   font-weight: 600;

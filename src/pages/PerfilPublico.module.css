@@ -87,7 +87,7 @@
 .profileType {
   font-size: 0.7rem;
   color: var(--accent-purple);
-  background: rgba(139, 92, 246, 0.15);
+  background: rgba(99, 102, 241, 0.15);
   border-radius: 6px;
   padding: 2px 8px;
   align-self: flex-start;
