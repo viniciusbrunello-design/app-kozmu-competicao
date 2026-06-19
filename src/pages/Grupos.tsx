@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Users, Plus, Copy, Share2, LogOut, ChevronRight, Globe, Lock } from 'lucide-react';
+import { Users, Plus, Copy, Share2, LogOut, ChevronRight, Globe, Lock, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '../components/ui/Header';
 import { Card } from '../components/ui/Card';
@@ -35,6 +35,7 @@ export function Grupos() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [showEnded, setShowEnded] = useState(false);
 
   function fetchGroups() {
     setLoading(true);
@@ -144,88 +145,137 @@ export function Grupos() {
                 </Card>
               )}
 
-              {groups.map((group) => (
-                <Card
-                  key={group.id}
-                  variant="glass"
-                  className={styles.groupCard}
-                  onClick={() => navigate(`/grupos/${group.id}`)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <div className={styles.groupHeader}>
-                    <div className={styles.groupInfo}>
-                      <h3 className={styles.groupName}>{group.name}</h3>
-                      {group.description && (
-                        <p className={styles.groupDesc}>{group.description}</p>
-                      )}
-                    </div>
-                    {group.myRole === 'admin' && (
-                      <span className={styles.adminBadge}>Admin</span>
-                    )}
-                  </div>
+              {(() => {
+                const activeGroups = groups.filter((g) => g.isActive !== false);
+                const endedGroups  = groups.filter((g) => g.isActive === false);
 
-                  <div className={styles.groupStats}>
-                    <div className={styles.stat}>
-                      <span className={styles.statValue}>{group.memberCount}</span>
-                      <span className={styles.statLabel}>Membros</span>
-                    </div>
-                    <div className={styles.stat}>
-                      <span className={styles.statValue} style={{ color: 'var(--accent-lime)' }}>
-                        {group.myPoints}
-                      </span>
-                      <span className={styles.statLabel}>Meus pts</span>
-                    </div>
-                    <div className={styles.stat}>
-                      <span className={styles.statValue} style={{ color: 'var(--status-warning)' }}>
-                        {group.daysUntilReset}d
-                      </span>
-                      <span className={styles.statLabel}>Reset</span>
-                    </div>
-                  </div>
-
-                  {group.members && group.members.length > 0 && (
-                    <div className={styles.memberRanking}>
-                      {group.members.slice(0, 3).map((m, i) => (
-                        <div key={m.id} className={styles.memberRow}>
-                          <span className={styles.memberRank}>#{i + 1}</span>
-                          <Avatar
-                            alt={m.user.displayName}
-                            size="sm"
-                            fallback={m.user.displayName.slice(0, 2).toUpperCase()}
-                            src={m.user.avatarUrl}
-                          />
-                          <div className={styles.memberInfo}>
-                            <span className={styles.memberName}>{m.user.displayName}</span>
-                            {m.user.league && (
-                              <span className={styles.memberLeague}>{LEAGUE_LABELS[m.user.league] ?? m.user.league}</span>
-                            )}
-                          </div>
-                          <span className={styles.memberPoints}>{m.cyclePoints} pts</span>
+                function GroupCard({ group }: { group: Group }) {
+                  return (
+                    <Card
+                      key={group.id}
+                      variant="glass"
+                      className={styles.groupCard}
+                      onClick={() => navigate(`/grupos/${group.id}`)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className={styles.groupHeader}>
+                        <div className={styles.groupInfo}>
+                          <h3 className={styles.groupName}>{group.name}</h3>
+                          {group.description && (
+                            <p className={styles.groupDesc}>{group.description}</p>
+                          )}
                         </div>
-                      ))}
-                    </div>
-                  )}
+                        {group.myRole === 'admin' && (
+                          <span className={styles.adminBadge}>Admin</span>
+                        )}
+                      </div>
 
-                  <div className={styles.groupFooter} onClick={(e) => e.stopPropagation()}>
-                    <button className={styles.codeBtn} onClick={() => handleShareCode(group)}>
-                      {copiedCode === group.id
-                        ? <Copy size={12} />
-                        : 'share' in navigator
-                        ? <Share2 size={12} />
-                        : <Copy size={12} />}
-                      <span>{copiedCode === group.id ? 'Copiado!' : group.inviteCode}</span>
-                    </button>
-                    <button className={styles.detailBtn} onClick={() => navigate(`/grupos/${group.id}`)}>
-                      <ChevronRight size={16} />
-                    </button>
-                    {group.myRole !== 'admin' && (
-                      <button className={styles.leaveBtn} onClick={() => handleLeave(group.id)}>
-                        <LogOut size={14} />
-                      </button>
+                      <div className={styles.groupStats}>
+                        <div className={styles.stat}>
+                          <span className={styles.statValue}>{group.memberCount}</span>
+                          <span className={styles.statLabel}>Membros</span>
+                        </div>
+                        <div className={styles.stat}>
+                          <span className={styles.statValue} style={{ color: 'var(--accent-lime)' }}>
+                            {group.myPoints}
+                          </span>
+                          <span className={styles.statLabel}>Meus pts</span>
+                        </div>
+                        {group.isActive !== false ? (
+                          <div className={styles.stat}>
+                            <span className={styles.statValue} style={{ color: 'var(--status-warning)' }}>
+                              {group.daysUntilReset}d
+                            </span>
+                            <span className={styles.statLabel}>Reset</span>
+                          </div>
+                        ) : (
+                          <div className={styles.stat}>
+                            <span className={styles.statValue} style={{ color: 'var(--text-muted)' }}>—</span>
+                            <span className={styles.statLabel}>Encerrado</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {group.members && group.members.length > 0 && (
+                        <div className={styles.memberRanking}>
+                          {group.members.slice(0, 3).map((m, i) => (
+                            <div key={m.id} className={styles.memberRow}>
+                              <span className={styles.memberRank}>#{i + 1}</span>
+                              <Avatar
+                                alt={m.user.displayName}
+                                size="sm"
+                                fallback={m.user.displayName.slice(0, 2).toUpperCase()}
+                                src={m.user.avatarUrl}
+                              />
+                              <div className={styles.memberInfo}>
+                                <span className={styles.memberName}>{m.user.displayName}</span>
+                                {m.user.league && (
+                                  <span className={styles.memberLeague}>{LEAGUE_LABELS[m.user.league] ?? m.user.league}</span>
+                                )}
+                              </div>
+                              <span className={styles.memberPoints}>{m.cyclePoints} pts</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className={styles.groupFooter} onClick={(e) => e.stopPropagation()}>
+                        {group.isActive !== false && (
+                          <button className={styles.codeBtn} onClick={() => handleShareCode(group)}>
+                            {copiedCode === group.id
+                              ? <Copy size={12} />
+                              : 'share' in navigator
+                              ? <Share2 size={12} />
+                              : <Copy size={12} />}
+                            <span>{copiedCode === group.id ? 'Copiado!' : group.inviteCode}</span>
+                          </button>
+                        )}
+                        <button className={styles.detailBtn} onClick={() => navigate(`/grupos/${group.id}`)}>
+                          <ChevronRight size={16} />
+                        </button>
+                        {group.myRole !== 'admin' && group.isActive !== false && (
+                          <button className={styles.leaveBtn} onClick={() => handleLeave(group.id)}>
+                            <LogOut size={14} />
+                          </button>
+                        )}
+                      </div>
+                    </Card>
+                  );
+                }
+
+                return (
+                  <>
+                    {activeGroups.map((group) => (
+                      <GroupCard key={group.id} group={group} />
+                    ))}
+
+                    {endedGroups.length > 0 && (
+                      <>
+                        <button
+                          className={styles.endedToggle}
+                          onClick={() => setShowEnded((v) => !v)}
+                        >
+                          <span>Grupos concluídos ({endedGroups.length})</span>
+                          <ChevronDown
+                            size={16}
+                            style={{ transform: showEnded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
+                          />
+                        </button>
+
+                        {showEnded && (
+                          <div className={styles.endedList}>
+                            {endedGroups.map((group) => (
+                              <div key={group.id} className={styles.endedCard}>
+                                <GroupCard group={group} />
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
                     )}
-                  </div>
-                </Card>
-              ))}
+                  </>
+                );
+              })()}
             </>
 
         </div>

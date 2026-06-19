@@ -66,6 +66,7 @@ interface MyGroup {
   name: string;
   emoji?: string;
   currentCycleEnd: string;
+  isActive: boolean;
 }
 
 interface CycleResult {
@@ -287,14 +288,14 @@ export function Home() {
           )}
 
           {/* Meus Grupos */}
-          {myGroups.length > 0 && (
+          {myGroups.filter((g) => g.isActive !== false).length > 0 && (
             <div className={styles.section}>
               <p className={styles.sectionLabel}>MEUS GRUPOS</p>
               <Card>
-                {myGroups.map((g, i) => (
+                {myGroups.filter((g) => g.isActive !== false).map((g, i, arr) => (
                   <button
                     key={g.id}
-                    className={`${styles.groupRow} ${i < myGroups.length - 1 ? styles.groupRowBorder : ''}`}
+                    className={`${styles.groupRow} ${i < arr.length - 1 ? styles.groupRowBorder : ''}`}
                     onClick={() => navigate(`/grupos/${g.id}`)}
                   >
                     <span className={styles.groupEmoji}>{g.emoji || '🏆'}</span>
