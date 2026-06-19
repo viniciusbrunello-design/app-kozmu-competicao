@@ -15,9 +15,20 @@ const LEAGUE_LABELS: Record<string, string> = {
 };
 
 const CYCLE_OPTIONS = [
-  { label: '7 dias', value: 'weekly' },
-  { label: '14 dias', value: 'biweekly' },
-  { label: '30 dias', value: 'monthly' },
+  { label: '7 dias',       value: 'weekly'   },
+  { label: '14 dias',      value: 'biweekly' },
+  { label: '30 dias',      value: 'monthly'  },
+  { label: 'Personalizado', value: 'custom'  },
+  { label: 'Sem limite',   value: 'none'     },
+];
+
+const FORMAT_CONFIG = [
+  { format: 'reel',     label: 'Reel',      emoji: '🎬', defaultPts: 5 },
+  { format: 'carousel', label: 'Carrossel', emoji: '🖼️', defaultPts: 4 },
+  { format: 'feed',     label: 'Feed',      emoji: '📷', defaultPts: 3 },
+  { format: 'story',    label: 'Story',     emoji: '⭕', defaultPts: 1 },
+  { format: 'live',     label: 'Live',      emoji: '🔴', defaultPts: 8 },
+  { format: 'linkedin', label: 'LinkedIn',  emoji: '💼', defaultPts: 4 },
 ];
 
 
@@ -31,7 +42,10 @@ export function Grupos() {
   const [form, setForm] = useState({
     name: '', description: '', inviteCode: '',
     type: 'private', cycleDuration: 'weekly',
+    customCycleDays: 14,
+    scoringRules: FORMAT_CONFIG.map((f) => ({ format: f.format, points: f.defaultPts })),
   });
+  const [showScoringRules, setShowScoringRules] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
@@ -58,10 +72,17 @@ export function Grupos() {
         description: form.description,
         type: form.type,
         cycleDuration: form.cycleDuration,
+        ...(form.cycleDuration === 'custom' && { customCycleDays: form.customCycleDays }),
+        scoringRules: form.scoringRules,
       });
       setGroups((prev) => [group as unknown as Group, ...prev]);
       setModal(null);
-      setForm({ name: '', description: '', inviteCode: '', type: 'private', cycleDuration: 'weekly' });
+      setForm({
+        name: '', description: '', inviteCode: '', type: 'private', cycleDuration: 'weekly',
+        customCycleDays: 14,
+        scoringRules: FORMAT_CONFIG.map((f) => ({ format: f.format, points: f.defaultPts })),
+      });
+      setShowScoringRules(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao criar grupo');
     } finally {
@@ -347,7 +368,66 @@ export function Grupos() {
                       </button>
                     ))}
                   </div>
+                  {form.cycleDuration === 'custom' && (
+                    <div className={styles.customDaysRow}>
+                      <input
+                        className={styles.customDaysInput}
+                        type="number"
+                        min={1}
+                        max={365}
+                        value={form.customCycleDays}
+                        onChange={(e) => setForm((f) => ({ ...f, customCycleDays: Math.max(1, Math.min(365, Number(e.target.value))) }))}
+                      />
+                      <span className={styles.customDaysLabel}>dias</span>
+                    </div>
+                  )}
                 </div>
+
+                <div className={styles.field}>
+                  <button
+                    type="button"
+                    className={styles.scoringToggle}
+                    onClick={() => setShowScoringRules((v) => !v)}
+                  >
+                    <span>Regras de pontuação</span>
+                    <ChevronDown
+                      size={14}
+                      style={{ transform: showScoringRules ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
+                    />
+                  </button>
+                  {showScoringRules && (
+                    <div className={styles.scoringGrid}>
+                      {FORMAT_CONFIG.map((f) => {
+                        const rule = form.scoringRules.find((r) => r.format === f.format);
+                        return (
+                          <div key={f.format} className={styles.scoringRow}>
+                            <span className={styles.scoringLabel}>{f.emoji} {f.label}</span>
+                            <div className={styles.scoringInputWrap}>
+                              <input
+                                className={styles.scoringInput}
+                                type="number"
+                                min={1}
+                                max={99}
+                                value={rule?.points ?? f.defaultPts}
+                                onChange={(e) => {
+                                  const pts = Math.max(1, Math.min(99, Number(e.target.value)));
+                                  setForm((prev) => ({
+                                    ...prev,
+                                    scoringRules: prev.scoringRules.map((r) =>
+                                      r.format === f.format ? { ...r, points: pts } : r
+                                    ),
+                                  }));
+                                }}
+                              />
+                              <span className={styles.scoringPtsSuffix}>pts</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
                 <Button type="submit" variant="primary" fullWidth disabled={submitting}>
                   {submitting ? 'Criando...' : 'Criar Grupo'}
                 </Button>

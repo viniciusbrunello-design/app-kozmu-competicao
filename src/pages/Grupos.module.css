@@ -400,6 +400,110 @@
   font-weight: 600;
 }
 
+/* Custom cycle days */
+.customDaysRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.customDaysInput {
+  width: 72px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.customDaysInput:focus { border-color: var(--accent-purple); }
+
+.customDaysLabel {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* Scoring rules toggle */
+.scoringToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.scoringToggle:hover {
+  background: var(--bg-surface);
+  border-color: var(--border-highlight);
+}
+
+.scoringGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 8px;
+  padding: 4px 0;
+}
+
+.scoringRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.scoringRow:last-child { border-bottom: none; }
+
+.scoringLabel {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.scoringInputWrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.scoringInput {
+  width: 48px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-family: inherit;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.scoringInput:focus { border-color: var(--accent-purple); }
+
+.scoringPtsSuffix {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
 /* Modal */
 .overlay {
   position: fixed;

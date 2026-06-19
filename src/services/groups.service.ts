@@ -74,7 +74,9 @@ export async function createGroup(data: {
   description?: string;
   type?: string;
   cycleDuration?: string;
+  customCycleDays?: number;
   maxMembers?: number;
+  scoringRules?: { format: string; points: number }[];
 }): Promise<Group> {
   return api.post<Group>('/groups', data);
 }

@@ -6,7 +6,7 @@ import { createNotification } from './notifications.service';
 import { DEFAULT_POINTS } from './points.service';
 import type { CreateGroupInput, JoinGroupInput } from '../schemas/groups.schema';
 
-function cycleEndDate(duration: string): Date {
+function cycleEndDate(duration: string, customDays?: number): Date {
   const now = new Date();
   switch (duration) {
     case 'biweekly':
@@ -14,6 +14,12 @@ function cycleEndDate(duration: string): Date {
       break;
     case 'monthly':
       now.setMonth(now.getMonth() + 1);
+      break;
+    case 'none':
+      now.setFullYear(now.getFullYear() + 100);
+      break;
+    case 'custom':
+      now.setDate(now.getDate() + (customDays ?? 7));
       break;
     default:
       now.setDate(now.getDate() + 7);
@@ -39,7 +45,7 @@ export async function createGroup(userId: string, input: CreateGroupInput) {
       type: input.type,
       cycleDuration: input.cycleDuration,
       maxMembers: input.maxMembers,
-      currentCycleEnd: cycleEndDate(input.cycleDuration),
+      currentCycleEnd: cycleEndDate(input.cycleDuration, input.customCycleDays),
       members: {
         create: { userId, role: 'admin' },
       },
