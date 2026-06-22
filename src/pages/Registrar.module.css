@@ -142,6 +142,40 @@
   color: var(--accent-lime);
 }
 
+/* Platform selection */
+.platformChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.platformChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 7px 13px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.platformChip:hover {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+.platformChipActive {
+  background: rgba(0, 122, 255, 0.1);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+  font-weight: 700;
+}
+
 /* Group selection */
 .groupChips {
   display: flex;

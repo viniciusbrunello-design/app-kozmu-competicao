@@ -23,12 +23,14 @@ const CYCLE_OPTIONS = [
 ];
 
 const FORMAT_CONFIG = [
-  { format: 'reel',     label: 'Reel',      emoji: '🎬', defaultPts: 5 },
-  { format: 'carousel', label: 'Carrossel', emoji: '🖼️', defaultPts: 4 },
-  { format: 'feed',     label: 'Feed',      emoji: '📷', defaultPts: 3 },
-  { format: 'story',    label: 'Story',     emoji: '⭕', defaultPts: 1 },
-  { format: 'live',     label: 'Live',      emoji: '🔴', defaultPts: 8 },
-  { format: 'linkedin', label: 'LinkedIn',  emoji: '💼', defaultPts: 4 },
+  { format: 'reel',     label: 'Vídeo curto', emoji: '🎬', defaultPts: 5 },
+  { format: 'carousel', label: 'Carrossel',   emoji: '🖼️', defaultPts: 4 },
+  { format: 'feed',     label: 'Estático',    emoji: '🖼',  defaultPts: 3 },
+  { format: 'photo',    label: 'Foto',        emoji: '📸', defaultPts: 2 },
+  { format: 'story',    label: 'Story',       emoji: '⭕', defaultPts: 1 },
+  { format: 'live',     label: 'Live',        emoji: '🔴', defaultPts: 8 },
+  { format: 'linkedin', label: 'Artigo',      emoji: '💼', defaultPts: 4 },
+  { format: 'podcast',  label: 'Vídeo longo', emoji: '🎙️', defaultPts: 3 },
 ];
 
 

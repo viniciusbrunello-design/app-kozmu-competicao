@@ -4,13 +4,14 @@ import { createNotification } from './notifications.service';
 export const DEFAULT_POINTS: Record<string, number> = {
   story: 1,
   other: 2,
+  photo: 2,
   feed: 3,
+  podcast: 3,
   carousel: 4,
   linkedin: 4,
   reel: 5,
   shorts: 5,
   tiktok: 5,
-  podcast: 3,
   live: 8,
 };
 

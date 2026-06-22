@@ -10,21 +10,27 @@ import type { Group } from '../services/groups.service';
 import styles from './Registrar.module.css';
 
 const FORMATS = [
-  { value: 'reel',      label: 'Reel / TikTok / Shorts', defaultPoints: 5, emoji: '🎬' },
-  { value: 'carousel',  label: 'Carrossel',               defaultPoints: 4, emoji: '🖼️' },
-  { value: 'feed',      label: 'Post de Feed',            defaultPoints: 3, emoji: '📷' },
-  { value: 'live',      label: 'Live',                    defaultPoints: 8, emoji: '🔴' },
-  { value: 'linkedin',  label: 'LinkedIn',                defaultPoints: 4, emoji: '💼' },
-  { value: 'story',     label: 'Story',                   defaultPoints: 1, emoji: '⭕' },
-  { value: 'podcast',   label: 'Podcast',                 defaultPoints: 3, emoji: '🎙️' },
-  { value: 'other',     label: 'Outros',                  defaultPoints: 2, emoji: '📌' },
+  { value: 'reel',     label: 'Vídeo curto',  defaultPoints: 5, emoji: '🎬' },
+  { value: 'carousel', label: 'Carrossel',    defaultPoints: 4, emoji: '🖼️' },
+  { value: 'feed',     label: 'Estático',     defaultPoints: 3, emoji: '🖼' },
+  { value: 'photo',    label: 'Foto',         defaultPoints: 2, emoji: '📸' },
+  { value: 'live',     label: 'Live',         defaultPoints: 8, emoji: '🔴' },
+  { value: 'linkedin', label: 'Artigo',       defaultPoints: 4, emoji: '💼' },
+  { value: 'story',    label: 'Story',        defaultPoints: 1, emoji: '⭕' },
+  { value: 'podcast',  label: 'Vídeo longo',  defaultPoints: 3, emoji: '🎙️' },
+  { value: 'other',    label: 'Outros',       defaultPoints: 2, emoji: '📌' },
 ];
 
-interface DetectResult {
-  platform: string;
-  format: string;
-  label: string;
-}
+const PLATFORMS = [
+  { value: 'instagram', label: 'Instagram', emoji: '📸' },
+  { value: 'tiktok',    label: 'TikTok',    emoji: '🎵' },
+  { value: 'youtube',   label: 'YouTube',   emoji: '▶️' },
+  { value: 'linkedin',  label: 'LinkedIn',  emoji: '💼' },
+  { value: 'twitter',   label: 'Twitter/X', emoji: '🐦' },
+  { value: 'other',     label: 'Outra rede', emoji: '🌐' },
+];
+
+interface DetectResult { platform: string; format: string; }
 
 function detectFromUrl(raw: string): DetectResult | null {
   let url: URL;
@@ -38,29 +44,29 @@ function detectFromUrl(raw: string): DetectResult | null {
   const path = url.pathname;
 
   if (host === 'instagram.com' || host === 'instagr.am') {
-    if (path.includes('/reel/'))    return { platform: 'instagram', format: 'reel',     label: '📸 Instagram Reel' };
-    if (path.includes('/stories/')) return { platform: 'instagram', format: 'story',    label: '📸 Instagram Story' };
-    if (path.includes('/p/'))       return { platform: 'instagram', format: 'carousel', label: '📸 Instagram Post' };
-    if (path.includes('/tv/'))      return { platform: 'instagram', format: 'live',     label: '📸 Instagram Live' };
-    return { platform: 'instagram', format: 'feed', label: '📸 Instagram' };
+    if (path.includes('/reel/'))    return { platform: 'instagram', format: 'reel'     };
+    if (path.includes('/stories/')) return { platform: 'instagram', format: 'story'    };
+    if (path.includes('/p/'))       return { platform: 'instagram', format: 'carousel' };
+    if (path.includes('/tv/'))      return { platform: 'instagram', format: 'live'     };
+    return { platform: 'instagram', format: 'feed' };
   }
 
   if (host === 'tiktok.com' || host === 'vm.tiktok.com') {
-    return { platform: 'tiktok', format: 'reel', label: '🎵 TikTok' };
+    return { platform: 'tiktok', format: 'reel' };
   }
 
   if (host === 'youtube.com' || host === 'youtu.be') {
-    if (path.includes('/shorts/')) return { platform: 'youtube', format: 'reel',  label: '▶️ YouTube Short' };
-    if (path.includes('/live/'))   return { platform: 'youtube', format: 'live',  label: '▶️ YouTube Live' };
-    return { platform: 'youtube', format: 'feed', label: '▶️ YouTube' };
+    if (path.includes('/shorts/')) return { platform: 'youtube', format: 'reel' };
+    if (path.includes('/live/'))   return { platform: 'youtube', format: 'live' };
+    return { platform: 'youtube', format: 'feed' };
   }
 
   if (host === 'linkedin.com' || host === 'lnkd.in') {
-    return { platform: 'linkedin', format: 'linkedin', label: '💼 LinkedIn' };
+    return { platform: 'linkedin', format: 'linkedin' };
   }
 
   if (host === 'twitter.com' || host === 'x.com') {
-    return { platform: 'twitter', format: 'feed', label: '🐦 Twitter/X' };
+    return { platform: 'twitter', format: 'feed' };
   }
 
   return null;
@@ -70,11 +76,12 @@ export function Registrar() {
   const navigate = useNavigate();
   const [url, setUrl] = useState('');
   const [format, setFormat] = useState('reel');
+  const [platform, setPlatform] = useState<string | null>(null);
+  const [isDetected, setIsDetected] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [newRecord, setNewRecord] = useState(false);
-  const [detected, setDetected] = useState<DetectResult | null>(null);
 
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
@@ -110,10 +117,11 @@ export function Registrar() {
     setUrl(value);
     const result = detectFromUrl(value.trim());
     if (result) {
-      setDetected(result);
       setFormat(result.format);
+      setPlatform(result.platform);
+      setIsDetected(true);
     } else {
-      setDetected(null);
+      setIsDetected(false);
     }
   }, []);
 
@@ -143,7 +151,7 @@ export function Registrar() {
         url,
         format,
         groupId: selectedGroupId ?? undefined,
-        platform: detected?.platform,
+        platform: platform ?? undefined,
       });
       setNewRecord(result.newRecord ?? false);
       setSuccess(true);
@@ -198,12 +206,29 @@ export function Registrar() {
                 required
                 className={styles.input}
               />
-              {detected && (
+              {isDetected && (
                 <div className={styles.detectedBadge}>
                   <Wand2 size={12} />
-                  <span>Detectado: <strong>{detected.label}</strong></span>
+                  <span>Rede e formato detectados automaticamente</span>
                 </div>
               )}
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.label}>Rede social</label>
+              <div className={styles.platformChips}>
+                {PLATFORMS.map((p) => (
+                  <button
+                    key={p.value}
+                    type="button"
+                    className={`${styles.platformChip} ${platform === p.value ? styles.platformChipActive : ''}`}
+                    onClick={() => setPlatform(p.value)}
+                  >
+                    <span>{p.emoji}</span>
+                    <span>{p.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className={styles.field}>
