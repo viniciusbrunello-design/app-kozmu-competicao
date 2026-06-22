@@ -133,6 +133,7 @@ export function Home() {
   const [heatmap, setHeatmap] = useState<{ date: string; count: number }[]>([]);
   const [activeGoal, setActiveGoal] = useState<UserGoal | null>(null);
   const [myGroups, setMyGroups] = useState<MyGroup[]>([]);
+  const [consistencyPeriod, setConsistencyPeriod] = useState<'semanal' | 'mensal' | 'trimestral'>('mensal');
 
   useEffect(() => {
     Promise.all([
@@ -182,9 +183,10 @@ export function Home() {
   const shields = (streak as { catchUpTokens?: number } | undefined)?.catchUpTokens ?? 0;
   const totalPosts = user?.stats?.submissionCount ?? 0;
 
-  const last30Days = heatmap.slice(-30);
-  const consistency = last30Days.length
-    ? Math.round((last30Days.filter((d) => d.count > 0).length / last30Days.length) * 100)
+  const PERIOD_DAYS: Record<string, number> = { semanal: 7, mensal: 30, trimestral: 90 };
+  const periodSlice = heatmap.slice(-PERIOD_DAYS[consistencyPeriod]);
+  const consistency = periodSlice.length
+    ? Math.round((periodSlice.filter((d) => d.count > 0).length / periodSlice.length) * 100)
     : 0;
 
   const MILESTONES: Record<number, string> = {
@@ -269,7 +271,19 @@ export function Home() {
               >
                 {consistency}%
               </span>
-              <span className={styles.statCaption}>constância (30d)</span>
+              <span className={styles.statCaption}>constância</span>
+              <div className={styles.periodChips}>
+                {(['semanal', 'mensal', 'trimestral'] as const).map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    className={`${styles.periodChip} ${consistencyPeriod === p ? styles.periodChipActive : ''}`}
+                    onClick={() => setConsistencyPeriod(p)}
+                  >
+                    {p === 'semanal' ? '7d' : p === 'mensal' ? '30d' : '90d'}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 

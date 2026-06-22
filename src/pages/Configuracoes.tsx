@@ -21,8 +21,6 @@ const PROFILE_TYPES = [
   { value: 'agency', label: 'Agência' },
 ];
 
-const WEEKLY_TARGET_OPTIONS = [3, 5, 7];
-
 export function Configuracoes() {
   const { user, refreshUser } = useAuth();
   const navigate = useNavigate();
@@ -37,6 +35,7 @@ export function Configuracoes() {
   const [saved, setSaved] = useState(false);
 
   const [weeklyTarget, setWeeklyTarget] = useState(5);
+  const [weeklyTargetInput, setWeeklyTargetInput] = useState('5');
   const [targetSaving, setTargetSaving] = useState(false);
 
   useEffect(() => {
@@ -46,7 +45,9 @@ export function Configuracoes() {
       setBio(user.bio ?? '');
       setProfileType(user.profileType ?? 'creator');
       setPlatforms(Array.isArray(user.platforms) ? user.platforms : []);
-      setWeeklyTarget(user.streak?.weeklyTarget ?? 5);
+      const wt = user.streak?.weeklyTarget ?? 5;
+      setWeeklyTarget(wt);
+      setWeeklyTargetInput(String(wt));
     }
   }, [user]);
 
@@ -163,18 +164,27 @@ export function Configuracoes() {
           <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', margin: 0 }}>
             Quantas publicações você quer fazer por semana?
           </p>
-          <div className={styles.typeGrid}>
-            {WEEKLY_TARGET_OPTIONS.map((t) => (
-              <button
-                key={t}
-                type="button"
-                className={`${styles.typeChip} ${weeklyTarget === t ? styles.typeActive : ''}`}
-                onClick={() => handleSelectTarget(t)}
-                disabled={targetSaving}
-              >
-                {t} dias
-              </button>
-            ))}
+          <div className={styles.weeklyTargetRow}>
+            <input
+              type="number"
+              min={1}
+              max={31}
+              value={weeklyTargetInput}
+              onChange={(e) => setWeeklyTargetInput(e.target.value)}
+              onBlur={() => {
+                const v = parseInt(weeklyTargetInput, 10);
+                if (!isNaN(v) && v >= 1) {
+                  handleSelectTarget(v);
+                } else {
+                  setWeeklyTargetInput(String(weeklyTarget));
+                }
+              }}
+              className={styles.weeklyTargetInput}
+              disabled={targetSaving}
+            />
+            <span className={styles.weeklyTargetLabel}>
+              {targetSaving ? 'salvando...' : 'posts por semana'}
+            </span>
           </div>
         </section>
 

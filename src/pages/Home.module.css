@@ -137,6 +137,38 @@
   line-height: 1.3;
 }
 
+/* ---- Period chips (constância) ---- */
+.periodChips {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.periodChip {
+  padding: 3px 7px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.6rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+  line-height: 1.4;
+}
+
+.periodChip:hover {
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+}
+
+.periodChipActive {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+}
+
 /* ---- Calendar ---- */
 .calendar {
   padding: 14px !important;

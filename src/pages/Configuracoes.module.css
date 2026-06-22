@@ -198,6 +198,48 @@
   font-weight: 600;
 }
 
+.weeklyTargetRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.weeklyTargetInput {
+  width: 80px;
+  padding: 12px 0;
+  border-radius: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-family: inherit;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -moz-appearance: textfield;
+}
+
+.weeklyTargetInput::-webkit-inner-spin-button,
+.weeklyTargetInput::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.weeklyTargetInput:focus {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.weeklyTargetInput:disabled {
+  opacity: 0.5;
+}
+
+.weeklyTargetLabel {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
 .platformGrid {
   display: flex;
   flex-wrap: wrap;
