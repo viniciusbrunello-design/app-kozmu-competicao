@@ -98,7 +98,11 @@ export function Grupos() {
       const group = await groupsService.joinGroup(form.inviteCode.trim());
       setGroups((prev) => [group, ...prev]);
       setModal(null);
-      setForm({ name: '', description: '', inviteCode: '', type: 'private', cycleDuration: 'weekly' });
+      setForm({
+        name: '', description: '', inviteCode: '', type: 'private', cycleDuration: 'weekly',
+        customCycleDays: 14,
+        scoringRules: FORMAT_CONFIG.map((f) => ({ format: f.format, points: f.defaultPts })),
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Código inválido');
     } finally {
