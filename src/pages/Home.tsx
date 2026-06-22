@@ -272,19 +272,21 @@ export function Home() {
                 {consistency}%
               </span>
               <span className={styles.statCaption}>constância</span>
-              <div className={styles.periodChips}>
-                {(['semanal', 'mensal', 'trimestral'] as const).map((p) => (
-                  <button
-                    key={p}
-                    type="button"
-                    className={`${styles.periodChip} ${consistencyPeriod === p ? styles.periodChipActive : ''}`}
-                    onClick={() => setConsistencyPeriod(p)}
-                  >
-                    {p === 'semanal' ? '7d' : p === 'mensal' ? '30d' : '90d'}
-                  </button>
-                ))}
-              </div>
             </div>
+          </div>
+
+          {/* Period selector for consistency */}
+          <div className={styles.periodRow}>
+            {(['semanal', 'mensal', 'trimestral'] as const).map((p) => (
+              <button
+                key={p}
+                type="button"
+                className={`${styles.periodBtn} ${consistencyPeriod === p ? styles.periodBtnActive : ''}`}
+                onClick={() => setConsistencyPeriod(p)}
+              >
+                {p === 'semanal' ? 'Semana' : p === 'mensal' ? 'Mês' : 'Trimestre'}
+              </button>
+            ))}
           </div>
 
           {/* Monthly calendar — sempre visível, dias ativos preenchidos quando heatmap carrega */}
