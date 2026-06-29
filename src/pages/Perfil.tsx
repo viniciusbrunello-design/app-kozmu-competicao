@@ -123,7 +123,7 @@ export function Perfil() {
             <div className={styles.statBox}>
               <Target size={20} className={styles.statIcon} style={{ color: 'var(--accent-purple)' }} />
               <span className={styles.statValue}>{user.stats?.submissionCount ?? 0}</span>
-              <span className={styles.statLabel}>Posts</span>
+              <span className={styles.statLabel}>Postagens</span>
             </div>
             <div className={styles.statBox}>
               <span className={styles.statValueLarge}>{user.totalPoints}</span>

@@ -343,6 +343,7 @@ export function GrupoDetalhe() {
             <div className={styles.myCardContent}>
               <span className={styles.myRank}>#{myRankEntry.rank}</span>
               <div className={styles.myStats}>
+                <span className={styles.myPostCount}>{myRankEntry.submissionCount} postagens</span>
                 <span className={styles.myPoints}>{myRankEntry.points} pts</span>
                 {myRankEntry.currentStreak > 0 && (
                   <span className={styles.myStreak}>
@@ -428,17 +429,16 @@ export function GrupoDetalhe() {
                         {entry.displayName}
                         {isMe && <span className={styles.youBadge}>você</span>}
                       </button>
-                      <span
-                        className={styles.rankLeague}
-                        style={{ color: LEAGUE_COLORS[entry.league] ?? 'var(--text-muted)' }}
-                      >
-                        {entry.submissionCount} posts
-                        {entry.currentStreak > 0 && ` · 🔥${entry.currentStreak}`}
-                      </span>
+                      {entry.currentStreak > 0 && (
+                        <span className={styles.rankStreak}>🔥 {entry.currentStreak} dias</span>
+                      )}
                     </div>
                     <div className={styles.rankRight}>
-                      <span className={styles.rankPoints}>{entry.points} pts</span>
-                      <div style={{ display: 'flex', gap: 4 }}>
+                      <div className={styles.rankMetrics}>
+                        <span className={styles.rankPostCount}>{entry.submissionCount} posts</span>
+                        <span className={styles.rankPoints}>{entry.points} pts</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end' }}>
                         {!isMe && (
                           <button
                             className={`${styles.nudgeBtn} ${nudged ? styles.nudgeDone : ''}`}

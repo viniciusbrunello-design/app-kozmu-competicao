@@ -214,10 +214,34 @@
   flex-shrink: 0;
 }
 
+.rankMetrics {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.rankPostCount {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent-blue, #007AFF);
+}
+
 .rankPoints {
   font-size: 0.875rem;
   font-weight: 700;
   color: var(--accent-lime);
+}
+
+.rankStreak {
+  font-size: 0.7rem;
+  color: var(--status-warning, #f59e0b);
+}
+
+.myPostCount {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--accent-blue, #007AFF);
 }
 
 .nudgeBtn {
