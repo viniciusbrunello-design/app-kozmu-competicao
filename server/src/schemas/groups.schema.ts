@@ -3,12 +3,13 @@ import { z } from 'zod';
 export const createGroupSchema = z.object({
   name: z.string().min(3, 'Nome deve ter no mínimo 3 caracteres').max(60),
   description: z.string().max(300).optional(),
+  emoji: z.string().max(8).optional(),
   type: z.enum(['private', 'public', 'mastermind', 'corporate', 'thematic']).default('private'),
   cycleDuration: z.enum(['weekly', 'biweekly', 'monthly', 'custom', 'none']).default('weekly'),
   customCycleDays: z.number().int().min(1).max(365).optional(),
   maxMembers: z.number().int().min(2).max(100).default(20),
   scoringRules: z
-    .array(z.object({ format: z.string(), points: z.number().int().min(1) }))
+    .array(z.object({ format: z.string(), points: z.number().int().min(0) }))
     .optional(),
 });
 

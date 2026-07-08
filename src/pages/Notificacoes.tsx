@@ -40,6 +40,9 @@ function NotifIcon({ type }: { type: string }) {
     proof_validated:      { icon: <ShieldCheck size={18} />,  color: 'var(--accent-lime)' },
     proof_rejected:       { icon: <ShieldX size={18} />,      color: 'var(--accent-red, #ef4444)' },
     group_invite:         { icon: <Users size={18} />,        color: 'var(--accent-blue)' },
+    cycle_ended:          { icon: <Trophy size={18} />,       color: 'var(--accent-purple)' },
+    nudge:                { icon: <Zap size={18} />,          color: 'var(--accent-orange, #f97316)' },
+    streak_record:        { icon: <Flame size={18} />,        color: 'var(--accent-lime)' },
   };
 
   const entry = map[type] ?? { icon: <Bell size={18} />, color: 'var(--text-secondary)' };

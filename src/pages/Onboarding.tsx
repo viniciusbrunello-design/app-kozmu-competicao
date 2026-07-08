@@ -28,8 +28,6 @@ const POSTS_OPTIONS = [
   { label: '30+ posts', value: 35 },
 ];
 
-const FREQUENCY_OPTIONS = [3, 5, 7];
-
 const TOTAL_STEPS = 5;
 
 export function Onboarding() {
@@ -166,18 +164,22 @@ export function Onboarding() {
           <div className={styles.section}>
             <div className={styles.emoji}>📅</div>
             <h1 className={styles.title}>Sua meta semanal</h1>
-            <p className={styles.subtitle}>Com que frequência você quer publicar por semana?</p>
-            <div className={styles.missionList}>
-              {FREQUENCY_OPTIONS.map((f) => (
-                <button
-                  key={f}
-                  type="button"
-                  className={`${styles.missionCard} ${weeklyFrequency === f ? styles.missionActive : ''}`}
-                  onClick={() => setWeeklyFrequency(f)}
-                >
-                  {f} dias por semana
-                </button>
-              ))}
+            <p className={styles.subtitle}>Quantas publicações você quer fazer por semana?</p>
+            <div className={styles.field}>
+              <input
+                className={styles.input}
+                type="number"
+                min={1}
+                max={99}
+                inputMode="numeric"
+                value={weeklyFrequency ?? ''}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  if (v === '') { setWeeklyFrequency(null); return; }
+                  setWeeklyFrequency(Math.max(1, Math.min(99, Number(v))));
+                }}
+                placeholder="Ex: 5"
+              />
             </div>
             <Button variant="primary" fullWidth onClick={() => setStep(5)} disabled={weeklyFrequency === null}>
               Continuar

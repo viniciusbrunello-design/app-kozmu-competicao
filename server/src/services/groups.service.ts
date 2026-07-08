@@ -27,6 +27,142 @@ function cycleEndDate(duration: string, customDays?: number): Date {
   return now;
 }
 
+type CycleMemberSnapshot = {
+  userId: string;
+  cyclePoints: number;
+  user: { displayName: string; username: string; avatarUrl: string | null; league: string };
+};
+
+async function notifyMemberJoined(groupId: string, groupName: string, newUserId: string, existingMemberIds: string[]): Promise<void> {
+  const newUser = await prisma.user.findUnique({
+    where: { id: newUserId },
+    select: { displayName: true, username: true },
+  });
+  if (!newUser) return;
+
+  await Promise.all(
+    existingMemberIds.map((memberId) =>
+      createNotification(
+        memberId,
+        'group_invite',
+        `👋 ${newUser.displayName} entrou no ${groupName}!`,
+        `@${newUser.username} acabou de entrar no grupo. A competição está esquentando!`,
+        { groupId, newMemberId: newUserId },
+      ),
+    ),
+  );
+}
+
+async function awardAndNotifyCycleResult(
+  group: { id: string; name: string; currentCycleEnd: Date },
+  sortedMembers: CycleMemberSnapshot[],
+  newCycleStarted: boolean,
+): Promise<void> {
+  const winner = sortedMembers[0];
+  const hasActivity = (winner?.cyclePoints ?? 0) > 0;
+
+  const podium = sortedMembers.slice(0, 3).map((m, i) => ({
+    rank: i + 1,
+    userId: m.userId,
+    displayName: m.user.displayName,
+    username: m.user.username,
+    avatarUrl: m.user.avatarUrl,
+    league: m.user.league,
+    cyclePoints: m.cyclePoints,
+  }));
+
+  if (hasActivity) {
+    await prisma.user.update({ where: { id: winner.userId }, data: { winCount: { increment: 1 } } });
+  }
+
+  await Promise.all(
+    sortedMembers.map((m, i) => {
+      const isWinner = hasActivity && m.userId === winner.userId;
+      const title = isWinner
+        ? `🏆 Você venceu o ciclo do ${group.name}!`
+        : `🏁 Ciclo encerrado no ${group.name}!`;
+      const body = hasActivity
+        ? `Você terminou em #${i + 1} com ${m.cyclePoints} pts.${isWinner ? '' : ` Vencedor: ${winner.user.displayName}.`}${newCycleStarted ? ' Um novo ciclo já começou!' : ''}`
+        : `O ciclo terminou sem publicações.${newCycleStarted ? ' Um novo ciclo já começou — bora publicar!' : ''}`;
+      return createNotification(m.userId, 'cycle_ended', title, body, {
+        groupId: group.id,
+        groupName: group.name,
+        cycleEnd: group.currentCycleEnd.toISOString(),
+        podium,
+        myRank: i + 1,
+        myPoints: m.cyclePoints,
+        newCycleStarted,
+      });
+    }),
+  );
+}
+
+async function finishCycleAndStartNext(groupId: string): Promise<boolean> {
+  const group = await prisma.group.findUnique({
+    where: { id: groupId },
+    include: {
+      members: {
+        orderBy: { cyclePoints: 'desc' },
+        include: {
+          user: { select: { displayName: true, username: true, avatarUrl: true, league: true } },
+        },
+      },
+    },
+  });
+  if (!group || !group.isActive || group.cycleDuration === 'none') return false;
+
+  // Ciclos personalizados: a duração é derivada do intervalo do ciclo anterior,
+  // já que o número de dias não é persistido no schema.
+  const customDays =
+    group.cycleDuration === 'custom'
+      ? Math.max(
+          1,
+          Math.round(
+            (group.currentCycleEnd.getTime() - group.currentCycleStart.getTime()) / 86400000,
+          ),
+        )
+      : undefined;
+
+  const newEnd = cycleEndDate(group.cycleDuration, customDays);
+
+  // Claim otimista: só a primeira requisição concorrente processa o ciclo
+  const claimed = await prisma.group.updateMany({
+    where: { id: groupId, currentCycleEnd: group.currentCycleEnd },
+    data: { currentCycleStart: new Date(), currentCycleEnd: newEnd },
+  });
+  if (claimed.count === 0) return false;
+
+  await prisma.groupMember.updateMany({ where: { groupId }, data: { cyclePoints: 0 } });
+  await awardAndNotifyCycleResult(group, group.members, true);
+  return true;
+}
+
+export async function ensureGroupCycleCurrent(groupId: string): Promise<void> {
+  const group = await prisma.group.findUnique({
+    where: { id: groupId },
+    select: { isActive: true, cycleDuration: true, currentCycleEnd: true },
+  });
+  if (!group || !group.isActive || group.cycleDuration === 'none') return;
+  if (group.currentCycleEnd >= new Date()) return;
+  await finishCycleAndStartNext(groupId);
+}
+
+export async function rolloverExpiredCycles(userId?: string): Promise<void> {
+  const expired = await prisma.group.findMany({
+    where: {
+      isActive: true,
+      cycleDuration: { not: 'none' },
+      currentCycleEnd: { lt: new Date() },
+      ...(userId ? { members: { some: { userId } } } : {}),
+    },
+    select: { id: true },
+  });
+
+  for (const g of expired) {
+    await finishCycleAndStartNext(g.id);
+  }
+}
+
 export async function createGroup(userId: string, input: CreateGroupInput) {
   const inviteCode = generateInviteCode();
 
@@ -41,6 +177,7 @@ export async function createGroup(userId: string, input: CreateGroupInput) {
     data: {
       name: input.name,
       description: input.description,
+      avatarUrl: input.emoji,
       inviteCode,
       type: input.type,
       cycleDuration: input.cycleDuration,
@@ -79,6 +216,7 @@ export async function joinGroup(userId: string, input: JoinGroupInput) {
 
   await prisma.groupMember.create({ data: { userId, groupId: group.id } });
   await createActivity(userId, 'group_joined', { groupName: group.name }, group.id);
+  await notifyMemberJoined(group.id, group.name, userId, group.members.map((m) => m.userId));
 
   return getGroupDetails(group.id, userId);
 }
@@ -93,6 +231,8 @@ export async function leaveGroup(userId: string, groupId: string): Promise<void>
 }
 
 export async function getUserGroups(userId: string) {
+  await rolloverExpiredCycles(userId);
+
   const memberships = await prisma.groupMember.findMany({
     where: { userId },
     include: {
@@ -113,6 +253,7 @@ export async function getUserGroups(userId: string) {
 
   return memberships.map((m) => ({
     ...m.group,
+    emoji: m.group.avatarUrl ?? undefined,
     myRole: m.role,
     myPoints: m.cyclePoints,
     memberCount: m.group._count.members,
@@ -124,6 +265,8 @@ export async function getUserGroups(userId: string) {
 }
 
 export async function getGroupDetails(groupId: string, userId?: string) {
+  await ensureGroupCycleCurrent(groupId);
+
   const group = await prisma.group.findUnique({
     where: { id: groupId },
     include: {
@@ -144,6 +287,7 @@ export async function getGroupDetails(groupId: string, userId?: string) {
 
   return {
     ...group,
+    emoji: group.avatarUrl ?? undefined,
     myRole: myMembership?.role ?? null,
     myPoints: myMembership?.cyclePoints ?? 0,
     memberCount: group._count.members,
@@ -196,6 +340,7 @@ export async function joinPublicGroup(userId: string, groupId: string) {
 
   await prisma.groupMember.create({ data: { userId, groupId: group.id } });
   await createActivity(userId, 'group_joined', { groupName: group.name }, group.id);
+  await notifyMemberJoined(group.id, group.name, userId, group.members.map((m) => m.userId));
 
   return getGroupDetails(group.id, userId);
 }
@@ -299,10 +444,28 @@ export async function endGroup(groupId: string, adminUserId: string): Promise<vo
   });
   if (!membership || membership.role !== 'admin') throw new ForbiddenError('Apenas admins podem encerrar o grupo');
 
+  const group = await prisma.group.findUnique({
+    where: { id: groupId },
+    include: {
+      members: {
+        orderBy: { cyclePoints: 'desc' },
+        include: {
+          user: { select: { displayName: true, username: true, avatarUrl: true, league: true } },
+        },
+      },
+    },
+  });
+  if (!group) throw new NotFoundError('Grupo');
+  if (!group.isActive) return;
+
   await prisma.group.update({
     where: { id: groupId },
     data: { isActive: false, currentCycleEnd: new Date() },
   });
+
+  // Resultado final: premia o vencedor e notifica os membros.
+  // cyclePoints não são zerados para preservar o ranking final do grupo.
+  await awardAndNotifyCycleResult(group, group.members, false);
 }
 
 export async function updateGroupSettings(
@@ -346,25 +509,11 @@ export async function updateScoringRules(
   );
 }
 
-export async function resetGroupCycle(groupId: string): Promise<void> {
-  const group = await prisma.group.findUnique({
-    where: { id: groupId },
-    select: { cycleDuration: true, members: { select: { userId: true, cyclePoints: true } } },
+export async function resetGroupCycle(groupId: string, adminUserId: string): Promise<void> {
+  const membership = await prisma.groupMember.findUnique({
+    where: { userId_groupId: { userId: adminUserId, groupId } },
   });
-  if (!group) throw new NotFoundError('Grupo');
+  if (!membership || membership.role !== 'admin') throw new ForbiddenError('Apenas admins podem reiniciar o ciclo');
 
-  const winner = group.members.sort((a, b) => b.cyclePoints - a.cyclePoints)[0];
-
-  if (winner) {
-    await prisma.user.update({ where: { id: winner.userId }, data: { winCount: { increment: 1 } } });
-  }
-
-  await prisma.groupMember.updateMany({ where: { groupId }, data: { cyclePoints: 0 } });
-  await prisma.group.update({
-    where: { id: groupId },
-    data: {
-      currentCycleStart: new Date(),
-      currentCycleEnd: cycleEndDate(group.cycleDuration),
-    },
-  });
+  await finishCycleAndStartNext(groupId);
 }

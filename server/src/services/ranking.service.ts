@@ -76,8 +76,8 @@ async function buildRanking(since: Date, groupId?: string, rankingMode = 'points
   }));
 }
 
-export async function getWeeklyRanking(groupId?: string) {
-  let rankingMode = 'points';
+export async function getWeeklyRanking(groupId?: string, mode?: string) {
+  let rankingMode = mode ?? 'points';
   if (groupId) {
     const group = await prisma.group.findUnique({ where: { id: groupId }, select: { rankingMode: true } });
     rankingMode = group?.rankingMode ?? 'points';
@@ -85,8 +85,8 @@ export async function getWeeklyRanking(groupId?: string) {
   return buildRanking(getWeekStart(), groupId, rankingMode);
 }
 
-export async function getMonthlyRanking(groupId?: string) {
-  let rankingMode = 'points';
+export async function getMonthlyRanking(groupId?: string, mode?: string) {
+  let rankingMode = mode ?? 'points';
   if (groupId) {
     const group = await prisma.group.findUnique({ where: { id: groupId }, select: { rankingMode: true } });
     rankingMode = group?.rankingMode ?? 'points';

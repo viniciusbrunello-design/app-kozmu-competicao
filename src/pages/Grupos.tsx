@@ -33,6 +33,8 @@ const FORMAT_CONFIG = [
   { format: 'podcast',  label: 'Vídeo longo', emoji: '🎙️', defaultPts: 3 },
 ];
 
+const GROUP_EMOJIS = ['🏆', '🔥', '🚀', '🎯', '📈', '💪', '⭐', '🎬', '👑', '⚡'];
+
 
 export function Grupos() {
   const navigate = useNavigate();
@@ -42,7 +44,7 @@ export function Grupos() {
 
   const [modal, setModal] = useState<'create' | 'join' | null>(null);
   const [form, setForm] = useState({
-    name: '', description: '', inviteCode: '',
+    name: '', description: '', emoji: '🏆', inviteCode: '',
     type: 'private', cycleDuration: 'weekly',
     customCycleDays: 14,
     scoringRules: FORMAT_CONFIG.map((f) => ({ format: f.format, points: f.defaultPts })),
@@ -72,6 +74,7 @@ export function Grupos() {
       const group = await groupsService.createGroup({
         name: form.name,
         description: form.description,
+        emoji: form.emoji,
         type: form.type,
         cycleDuration: form.cycleDuration,
         ...(form.cycleDuration === 'custom' && { customCycleDays: form.customCycleDays }),
@@ -80,7 +83,7 @@ export function Grupos() {
       setGroups((prev) => [group as unknown as Group, ...prev]);
       setModal(null);
       setForm({
-        name: '', description: '', inviteCode: '', type: 'private', cycleDuration: 'weekly',
+        name: '', description: '', emoji: '🏆', inviteCode: '', type: 'private', cycleDuration: 'weekly',
         customCycleDays: 14,
         scoringRules: FORMAT_CONFIG.map((f) => ({ format: f.format, points: f.defaultPts })),
       });
@@ -101,7 +104,7 @@ export function Grupos() {
       setGroups((prev) => [group, ...prev]);
       setModal(null);
       setForm({
-        name: '', description: '', inviteCode: '', type: 'private', cycleDuration: 'weekly',
+        name: '', description: '', emoji: '🏆', inviteCode: '', type: 'private', cycleDuration: 'weekly',
         customCycleDays: 14,
         scoringRules: FORMAT_CONFIG.map((f) => ({ format: f.format, points: f.defaultPts })),
       });
@@ -187,7 +190,7 @@ export function Grupos() {
                     >
                       <div className={styles.groupHeader}>
                         <div className={styles.groupInfo}>
-                          <h3 className={styles.groupName}>{group.name}</h3>
+                          <h3 className={styles.groupName}>{group.emoji ? `${group.emoji} ` : ''}{group.name}</h3>
                           {group.description && (
                             <p className={styles.groupDesc}>{group.description}</p>
                           )}
@@ -342,6 +345,21 @@ export function Grupos() {
                   />
                 </div>
                 <div className={styles.field}>
+                  <label className={styles.label}>Emoji do grupo</label>
+                  <div className={styles.emojiGrid}>
+                    {GROUP_EMOJIS.map((em) => (
+                      <button
+                        key={em}
+                        type="button"
+                        className={`${styles.emojiChip} ${form.emoji === em ? styles.emojiActive : ''}`}
+                        onClick={() => setForm((f) => ({ ...f, emoji: em }))}
+                      >
+                        {em}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className={styles.field}>
                   <label className={styles.label}>Visibilidade</label>
                   <div className={styles.typeGrid}>
                     <button
@@ -412,11 +430,12 @@ export function Grupos() {
                               <input
                                 className={styles.scoringInput}
                                 type="number"
-                                min={1}
+                                min={0}
                                 max={99}
+                                title="0 = formato bloqueado no grupo"
                                 value={rule?.points ?? f.defaultPts}
                                 onChange={(e) => {
-                                  const pts = Math.max(1, Math.min(99, Number(e.target.value)));
+                                  const pts = Math.max(0, Math.min(99, Number(e.target.value)));
                                   setForm((prev) => ({
                                     ...prev,
                                     scoringRules: prev.scoringRules.map((r) =>

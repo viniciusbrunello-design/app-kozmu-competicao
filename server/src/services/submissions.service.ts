@@ -4,6 +4,7 @@ import { getPointsForFormat, addPointsToUser } from './points.service';
 import { processCheckIn } from './streak.service';
 import { createActivity } from './activity.service';
 import { createNotification } from './notifications.service';
+import { ensureGroupCycleCurrent } from './groups.service';
 import type { CreateSubmissionInput } from '../schemas/submissions.schema';
 
 export async function createSubmission(userId: string, input: CreateSubmissionInput) {
@@ -28,8 +29,14 @@ export async function createSubmission(userId: string, input: CreateSubmissionIn
   if (input.groupId) {
     const member = await prisma.groupMember.findUnique({
       where: { userId_groupId: { userId, groupId: input.groupId } },
+      include: { group: { select: { isActive: true } } },
     });
     if (!member) throw new ForbiddenError('Você não é membro deste grupo');
+    if (!member.group.isActive) throw new ForbiddenError('Este grupo foi encerrado');
+
+    // Se o ciclo expirou, processa a virada antes de pontuar,
+    // para que a publicação conte no ciclo novo e não no antigo.
+    await ensureGroupCycleCurrent(input.groupId);
   }
 
   const submission = await prisma.submission.create({

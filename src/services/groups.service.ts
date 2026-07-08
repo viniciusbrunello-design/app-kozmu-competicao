@@ -4,6 +4,7 @@ export interface Group {
   id: string;
   name: string;
   description?: string;
+  emoji?: string;
   inviteCode: string;
   type: string;
   cycleDuration: string;
@@ -72,6 +73,7 @@ export async function getGroupDetails(groupId: string): Promise<Group> {
 export async function createGroup(data: {
   name: string;
   description?: string;
+  emoji?: string;
   type?: string;
   cycleDuration?: string;
   customCycleDays?: number;

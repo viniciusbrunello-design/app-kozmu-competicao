@@ -24,11 +24,6 @@ const RANKING_MODE_OPTIONS = [
   { value: 'format:story',    label: '⭕ Stories' },
 ];
 
-const LEAGUE_COLORS: Record<string, string> = {
-  bronze: '#cd7f32', silver: '#c0c0c0', gold: '#ffd700',
-  platinum: '#b5e0ff', cosmos: '#a78bfa', nova: '#f59e0b', orbit: '#34d399',
-};
-
 const FORMAT_EMOJI: Record<string, string> = {
   reel: '🎬', carousel: '🖼️', feed: '📷', live: '🔴', linkedin: '💼', story: '⭕', podcast: '🎙️', other: '📌',
 };
@@ -316,8 +311,10 @@ export function GrupoDetalhe() {
           <ArrowLeft size={20} />
         </button>
         <div className={styles.headerInfo}>
-          <h1 className={styles.headerTitle}>{group!.name}</h1>
-          <span className={styles.headerSub}>{group!.memberCount} membros · {daysLeft}d para reset</span>
+          <h1 className={styles.headerTitle}>{group!.emoji ? `${group!.emoji} ` : ''}{group!.name}</h1>
+          <span className={styles.headerSub}>
+            {group!.memberCount} membros · {group!.isActive ? `${daysLeft}d para reset` : 'grupo encerrado'}
+          </span>
         </div>
         {group?.myRole === 'admin' && (
           <button
@@ -336,6 +333,12 @@ export function GrupoDetalhe() {
       {copied && <div className={styles.copiedToast}>Código copiado!</div>}
 
       <div className="page-content">
+
+        {!group!.isActive && (
+          <div className={styles.endedBanner}>
+            🏁 Ciclo encerrado! Este é o ranking final do grupo.
+          </div>
+        )}
 
         {myRankEntry && (
           <Card variant="glass" glow="purple" className={styles.myCard}>
@@ -373,13 +376,15 @@ export function GrupoDetalhe() {
         )}
 
         {/* Check-in CTA */}
-        <button
-          className={styles.checkInCta}
-          onClick={() => { setCheckIn(true); setCiError(''); setCiSuccess(false); }}
-        >
-          <Plus size={16} />
-          Registrar publicação no grupo
-        </button>
+        {group!.isActive && (
+          <button
+            className={styles.checkInCta}
+            onClick={() => { setCheckIn(true); setCiError(''); setCiSuccess(false); }}
+          >
+            <Plus size={16} />
+            Registrar publicação no grupo
+          </button>
+        )}
 
         <div className={styles.tabs}>
           <button

@@ -190,7 +190,7 @@ router.post('/:id/end', async (req: AuthRequest, res: Response, next: NextFuncti
 
 router.post('/:id/reset-cycle', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    await groupsService.resetGroupCycle(req.params.id);
+    await groupsService.resetGroupCycle(req.params.id, req.userId!);
     res.json({ success: true });
   } catch (err) {
     next(err);

@@ -7,6 +7,7 @@ import { ProgressBar } from '../components/ui/ProgressBar';
 import { Avatar } from '../components/ui/Avatar';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
+import { getNotifications, markRead } from '../services/notifications.service';
 import { api } from '../services/api';
 import type { UserGoal } from '../services/goals.service';
 import styles from './Home.module.css';
@@ -70,6 +71,7 @@ interface MyGroup {
 }
 
 interface CycleResult {
+  notificationId?: string;
   groupId: string;
   groupName: string;
   cycleEnd: string;
@@ -85,7 +87,7 @@ interface CycleResult {
   }[];
   myRank: number;
   myPoints: number;
-  totalMembers: number;
+  totalMembers?: number;
 }
 
 const RANK_MEDAL: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
@@ -137,10 +139,6 @@ export function Home() {
 
   useEffect(() => {
     Promise.all([
-      api
-        .get<{ notifications: unknown[]; unreadCount: number }>('/notifications?unread=true')
-        .then((r) => setUnreadCount(r.unreadCount))
-        .catch(() => {}),
       api.get<{ date: string; count: number }[]>('/users/me/heatmap').then(setHeatmap).catch(() => {}),
       api
         .get<UserGoal[]>('/goals')
@@ -148,24 +146,30 @@ export function Home() {
         .catch(() => {}),
       api.get<MyGroup[]>('/groups').then(setMyGroups).catch(() => {}),
     ]);
-    checkEndedCycles();
+    loadNotifications();
   }, []);
 
-  async function checkEndedCycles() {
+  async function loadNotifications() {
     try {
-      const groups = await api.get<MyGroup[]>('/groups');
-      const ended = groups.find((g) => new Date(g.currentCycleEnd) < new Date());
-      if (!ended) return;
-      const key = `cycle_dismissed_${ended.id}_${ended.currentCycleEnd}`;
-      if (sessionStorage.getItem(key)) return;
-      const result = await api.get<CycleResult>(`/groups/${ended.id}/cycle-result`);
-      if (result.isEnded) setCycleModal(result);
+      const { notifications, unreadCount: count } = await getNotifications(true);
+      setUnreadCount(count);
+
+      // O servidor vira o ciclo automaticamente e envia o resultado
+      // como notificação cycle_ended — usada aqui para exibir o pódio.
+      const cycleNotif = notifications.find((n) => n.type === 'cycle_ended');
+      if (!cycleNotif) return;
+      const data = cycleNotif.data as unknown as CycleResult;
+      if (!data?.podium?.length) return;
+      setCycleModal({ ...data, notificationId: cycleNotif.id });
     } catch { /* ignore */ }
   }
 
   function dismissCycleModal() {
     if (!cycleModal) return;
-    sessionStorage.setItem(`cycle_dismissed_${cycleModal.groupId}_${cycleModal.cycleEnd}`, '1');
+    if (cycleModal.notificationId) {
+      markRead(cycleModal.notificationId).catch(() => {});
+      setUnreadCount((c) => Math.max(0, c - 1));
+    }
     setCycleModal(null);
   }
 

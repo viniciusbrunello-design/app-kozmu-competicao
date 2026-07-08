@@ -9,7 +9,8 @@ router.use(requireAuth);
 router.get('/weekly', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const groupId = req.query.groupId as string | undefined;
-    const ranking = await rankingService.getWeeklyRanking(groupId);
+    const mode = (req.query.mode as string) === 'count' ? 'count' : 'points';
+    const ranking = await rankingService.getWeeklyRanking(groupId, mode);
     res.json({ success: true, data: ranking });
   } catch (err) {
     next(err);
@@ -19,7 +20,8 @@ router.get('/weekly', async (req: AuthRequest, res: Response, next: NextFunction
 router.get('/monthly', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const groupId = req.query.groupId as string | undefined;
-    const ranking = await rankingService.getMonthlyRanking(groupId);
+    const mode = (req.query.mode as string) === 'count' ? 'count' : 'points';
+    const ranking = await rankingService.getMonthlyRanking(groupId, mode);
     res.json({ success: true, data: ranking });
   } catch (err) {
     next(err);
