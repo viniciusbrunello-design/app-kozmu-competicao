@@ -21,14 +21,14 @@
 
 /* ---- Streak Card ---- */
 .streakCard {
-  background: #1C1C1E;
-  border: none;
-  border-radius: 20px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
   padding: 24px 20px;
   display: flex;
   align-items: center;
   gap: 0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
 }
 
 .streakLeft {
@@ -39,15 +39,17 @@
 }
 
 .streakNumber {
-  font-size: clamp(2rem, 8vw, 2.75rem);
+  font-size: clamp(2rem, 8vw, 3rem);
   font-weight: 800;
-  color: #FFFFFF;
+  color: var(--text-primary);
   line-height: 1;
+  letter-spacing: -0.04em;
 }
 
 .streakSubLabel {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .shieldTag {
@@ -68,7 +70,7 @@
 .streakSep {
   width: 1px;
   height: 52px;
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--border-color);
   margin: 0 20px;
   flex-shrink: 0;
 }
@@ -82,16 +84,17 @@
 
 .recordLabel {
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .recordValue {
   font-size: 1.125rem;
   font-weight: 800;
-  color: #FFFFFF;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 .newRecordTag {
@@ -113,22 +116,24 @@
 
 .statCard {
   background: var(--bg-surface);
-  border-radius: 14px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 18px 12px;
+  padding: 20px 12px;
   gap: 0.5em;
 }
 
 .statNumber {
-  font-size: clamp(1.25rem, 5vw, 1.625rem);
+  font-size: clamp(1.25rem, 5vw, 1.75rem);
   font-weight: 800;
   color: var(--text-primary);
   line-height: 1;
+  letter-spacing: -0.03em;
 }
 
 .statCaption {
@@ -164,9 +169,10 @@
 }
 
 .periodBtnActive {
-  background: rgba(99, 102, 241, 0.12);
-  border-color: var(--accent-purple);
-  color: var(--accent-purple);
+  background: var(--bg-surface);
+  border-color: var(--bg-surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  color: var(--text-primary);
 }
 
 /* ---- Calendar ---- */

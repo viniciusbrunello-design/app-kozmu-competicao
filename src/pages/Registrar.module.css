@@ -44,8 +44,8 @@
 .input {
   width: 100%;
   padding: 14px 16px;
-  border-radius: 14px;
-  background: var(--bg-base);
+  border-radius: 16px;
+  background: var(--bg-surface);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
   font-size: 0.95rem;
@@ -76,8 +76,8 @@
   align-items: center;
   gap: 6px;
   padding: 16px 8px;
-  border-radius: 14px;
-  background: var(--bg-base);
+  border-radius: 16px;
+  background: var(--bg-surface);
   border: 2px solid var(--border-color);
   cursor: pointer;
   font-family: inherit;

@@ -1,22 +1,27 @@
 .card {
   background: var(--bg-surface);
-  border: none;
-  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
   padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  transition: box-shadow 0.2s;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
   color: var(--text-secondary);
   font-size: 0.9375rem;
 }
 
 .card:hover {
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.card:active {
+  transform: scale(0.98);
 }
 
 .card.glass {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
 }
 
 .card.elevated {
@@ -24,15 +29,17 @@
 }
 
 .card.glowLime {
-  box-shadow: 0 0 0 2px rgba(52, 199, 89, 0.3);
+  box-shadow: 0 0 0 2px var(--accent-lime);
 }
 
 .card.glowPurple {
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 0 0 2px var(--accent-purple);
 }
 
 .title {
   margin-bottom: 8px;
   font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
 }

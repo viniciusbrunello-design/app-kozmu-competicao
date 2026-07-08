@@ -1,35 +1,73 @@
 :root {
-  /* iOS Light Theme */
+  /* iOS Default Light Theme */
   --bg-base: #F2F2F7;
   --bg-surface: #FFFFFF;
-  --bg-surface-elevated: #EFEFF4;
-
-  --accent-purple: #6366F1;
-  --accent-purple-glow: rgba(99, 102, 241, 0.2);
-
+  --bg-surface-elevated: #F2F2F7;
+  
+  --accent-purple: #AF52DE;
+  --accent-purple-glow: rgba(175, 82, 222, 0.2);
+  
   --accent-blue: #007AFF;
   --accent-blue-glow: rgba(0, 122, 255, 0.2);
-
+  
   --accent-lime: #34C759;
   --accent-lime-glow: rgba(52, 199, 89, 0.2);
 
+  --accent-orange: #FF9500;
+  
   --status-error: #FF3B30;
-  --status-warning: #FF9500;
-
-  --text-primary: #1C1C1E;
-  --text-secondary: #8E8E93;
-  --text-muted: #C7C7CC;
-
-  --border-color: rgba(60, 60, 67, 0.13);
-  --border-highlight: rgba(60, 60, 67, 0.25);
-
+  --status-warning: #FFCC00;
+  
+  --text-primary: #000000;
+  --text-secondary: rgba(60, 60, 67, 0.6);
+  --text-muted: rgba(60, 60, 67, 0.3);
+  
+  --border-color: rgba(60, 60, 67, 0.18); /* Default iOS Separator */
+  --border-highlight: rgba(60, 60, 67, 0.29);
+  
   --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, 'Helvetica Neue', sans-serif;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* iOS Default Dark Theme */
+    --bg-base: #000000;
+    --bg-surface: #1C1C1E;
+    --bg-surface-elevated: #2C2C2E;
+    
+    --accent-purple: #BF5AF2;
+    --accent-purple-glow: rgba(191, 90, 242, 0.2);
+    
+    --accent-blue: #0A84FF;
+    --accent-blue-glow: rgba(10, 132, 255, 0.2);
+    
+    --accent-lime: #30D158;
+    --accent-lime-glow: rgba(48, 209, 88, 0.2);
+
+    --accent-orange: #FF9F0A;
+    
+    --status-error: #FF453A;
+    --status-warning: #FFD60A;
+    
+    --text-primary: #FFFFFF;
+    --text-secondary: rgba(235, 235, 245, 0.6);
+    --text-muted: rgba(235, 235, 245, 0.3);
+    
+    --border-color: rgba(84, 84, 88, 0.35); /* Dark iOS Separator */
+    --border-highlight: rgba(84, 84, 88, 0.65);
+
+    --glass-bg: rgba(28, 28, 30, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+  }
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -40,26 +78,39 @@ body {
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .glass-panel {
-  background: var(--bg-surface);
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
-a {
+a, button {
   color: var(--accent-blue);
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-a:hover {
-  color: var(--accent-purple);
+
+a:active, button:active {
+  opacity: 0.7;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
 }
 
 ::-webkit-scrollbar {
@@ -73,7 +124,7 @@ a:hover {
   min-height: 100vh;
   position: relative;
   background-color: var(--bg-base);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 8px 32px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.02), 0 8px 40px rgba(0, 0, 0, 0.06);
   padding-bottom: 80px;
   display: flex;
   flex-direction: column;
@@ -83,6 +134,7 @@ a:hover {
   flex: 1;
   padding: 24px 20px;
   overflow-y: auto;
+  padding-bottom: env(safe-area-inset-bottom, 24px);
 }
 
 @media (min-width: 768px) {
@@ -102,7 +154,7 @@ a:hover {
 
 @keyframes pulseGlow {
   0%   { box-shadow: 0 0 0 0 var(--accent-lime-glow); }
-  70%  { box-shadow: 0 0 0 8px rgba(52, 199, 89, 0); }
+  70%  { box-shadow: 0 0 0 12px rgba(52, 199, 89, 0); }
   100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
 }
 

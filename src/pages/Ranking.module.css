@@ -7,8 +7,8 @@
 .tabs {
   display: flex;
   gap: 0;
-  background: var(--bg-surface);
-  border-radius: 14px;
+  background: var(--bg-surface-elevated);
+  border-radius: 16px;
   padding: 4px;
 }
 
@@ -17,7 +17,7 @@
   padding: 10px;
   border: none;
   background: none;
-  border-radius: 10px;
+  border-radius: 12px;
   color: var(--text-secondary);
   font-size: 0.875rem;
   font-weight: 600;
@@ -29,7 +29,7 @@
 .tab.tabActive {
   background: var(--bg-surface);
   color: var(--text-primary);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .periodTabs {
@@ -52,8 +52,8 @@
 }
 
 .periodTab.periodTabActive {
-  background: var(--accent-purple);
-  border-color: var(--accent-purple);
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
   color: #fff;
 }
 
@@ -170,15 +170,18 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 14px;
-  border-radius: 12px;
-  background: var(--bg-surface);
+  padding: 16px 14px;
+  border-bottom: 1px solid var(--border-color);
+  background: transparent;
   transition: background 0.15s;
 }
 
+.listItem:last-child {
+  border-bottom: none;
+}
+
 .listItem.listItemMe {
-  background: rgba(99, 102, 241, 0.08);
-  border: 1px solid rgba(99, 102, 241, 0.18);
+  background: var(--accent-blue-glow);
 }
 
 .listRank {
