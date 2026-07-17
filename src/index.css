@@ -30,8 +30,7 @@
   --glass-border: rgba(255, 255, 255, 0.3);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+:root[data-theme="dark"] {
     /* iOS Default Dark Theme */
     --bg-base: #000000;
     --bg-surface: #1C1C1E;
@@ -60,7 +59,6 @@
 
     --glass-bg: rgba(28, 28, 30, 0.7);
     --glass-border: rgba(255, 255, 255, 0.1);
-  }
 }
 
 * {

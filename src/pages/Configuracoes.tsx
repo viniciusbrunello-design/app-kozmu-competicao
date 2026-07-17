@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check } from 'lucide-react';
+import { ArrowLeft, Check, Moon, Sun, Monitor } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { Button } from '../components/ui/Button';
 import { api } from '../services/api';
 import styles from './Configuracoes.module.css';
@@ -23,6 +24,7 @@ const PROFILE_TYPES = [
 
 export function Configuracoes() {
   const { user, refreshUser } = useAuth();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
 
   const [displayName, setDisplayName] = useState('');
@@ -156,6 +158,33 @@ export function Configuracoes() {
                 {pt.label}
               </button>
             ))}
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Aparência</h2>
+          <div className={styles.typeGrid}>
+            <button
+              type="button"
+              className={`${styles.typeChip} ${theme === 'light' ? styles.typeActive : ''}`}
+              onClick={() => setTheme('light')}
+            >
+              <Sun size={14} /> Claro
+            </button>
+            <button
+              type="button"
+              className={`${styles.typeChip} ${theme === 'dark' ? styles.typeActive : ''}`}
+              onClick={() => setTheme('dark')}
+            >
+              <Moon size={14} /> Escuro
+            </button>
+            <button
+              type="button"
+              className={`${styles.typeChip} ${theme === 'system' ? styles.typeActive : ''}`}
+              onClick={() => setTheme('system')}
+            >
+              <Monitor size={14} /> Sistema
+            </button>
           </div>
         </section>
 
