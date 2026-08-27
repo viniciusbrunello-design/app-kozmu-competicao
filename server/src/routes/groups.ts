@@ -1,4 +1,5 @@
 import { Router, Response, NextFunction } from 'express';
+import multer from 'multer';
 import { requireAuth, AuthRequest } from '../middleware/auth';
 import { validate } from '../middleware/validate';
 import { createGroupSchema, joinGroupSchema, updateGroupSchema } from '../schemas/groups.schema';
@@ -6,6 +7,8 @@ import * as groupsService from '../services/groups.service';
 import * as rankingService from '../services/ranking.service';
 import * as activityService from '../services/activity.service';
 import * as challengesService from '../services/challenges.service';
+
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
 const router = Router();
 
@@ -151,6 +154,19 @@ router.put('/:id/settings', async (req: AuthRequest, res: Response, next: NextFu
   try {
     await groupsService.updateGroupSettings(req.params.id, req.userId!, req.body);
     res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/:id/banner', upload.single('banner'), async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    if (!req.file) {
+      res.status(400).json({ success: false, error: { message: 'Arquivo não enviado' } });
+      return;
+    }
+    const url = await groupsService.uploadGroupBanner(req.params.id, req.userId!, req.file);
+    res.json({ success: true, data: { bannerUrl: url } });
   } catch (err) {
     next(err);
   }

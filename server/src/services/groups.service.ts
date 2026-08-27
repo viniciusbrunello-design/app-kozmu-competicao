@@ -471,7 +471,7 @@ export async function endGroup(groupId: string, adminUserId: string): Promise<vo
 export async function updateGroupSettings(
   groupId: string,
   userId: string,
-  data: { rankingMode?: string; name?: string; description?: string },
+  data: { rankingMode?: string; name?: string; description?: string; bannerUrl?: string | null },
 ): Promise<void> {
   const membership = await prisma.groupMember.findUnique({
     where: { userId_groupId: { userId, groupId } },
@@ -484,8 +484,48 @@ export async function updateGroupSettings(
       ...(data.rankingMode !== undefined && { rankingMode: data.rankingMode }),
       ...(data.name && { name: data.name }),
       ...(data.description !== undefined && { description: data.description }),
+      ...(data.bannerUrl !== undefined && { bannerUrl: data.bannerUrl }),
     },
   });
+}
+
+export async function uploadGroupBanner(
+  groupId: string,
+  userId: string,
+  file: { buffer: Buffer; mimetype: string; originalname: string },
+): Promise<string> {
+  const membership = await prisma.groupMember.findUnique({
+    where: { userId_groupId: { userId, groupId } },
+  });
+  if (!membership || membership.role !== 'admin') throw new ForbiddenError('Apenas admins podem editar o grupo');
+
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) throw new Error('Supabase Storage não configurado');
+
+  const ext = (file.originalname.split('.').pop() ?? 'jpg').toLowerCase();
+  const fileName = `${groupId}/${Date.now()}.${ext}`;
+
+  const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/group-banners/${fileName}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
+      'Content-Type': file.mimetype,
+      'x-upsert': 'true',
+    },
+    body: new Uint8Array(file.buffer),
+  });
+
+  if (!uploadRes.ok) {
+    const text = await uploadRes.text();
+    throw new Error(`Falha no upload: ${text}`);
+  }
+
+  const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/group-banners/${fileName}`;
+
+  await prisma.group.update({ where: { id: groupId }, data: { bannerUrl: publicUrl } });
+
+  return publicUrl;
 }
 
 export async function updateScoringRules(

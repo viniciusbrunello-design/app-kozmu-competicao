@@ -66,6 +66,7 @@ interface MyGroup {
   id: string;
   name: string;
   emoji?: string;
+  bannerUrl?: string;
   currentCycleEnd: string;
   isActive: boolean;
 }
@@ -311,22 +312,30 @@ export function Home() {
           {myGroups.filter((g) => g.isActive !== false).length > 0 && (
             <div className={styles.section}>
               <p className={styles.sectionLabel}>MEUS GRUPOS</p>
-              <Card>
-                {myGroups.filter((g) => g.isActive !== false).map((g, i, arr) => (
-                  <button
-                    key={g.id}
-                    className={`${styles.groupRow} ${i < arr.length - 1 ? styles.groupRowBorder : ''}`}
-                    onClick={() => navigate(`/grupos/${g.id}`)}
-                  >
-                    <span className={styles.groupEmoji}>{g.emoji || '🏆'}</span>
+              {myGroups.filter((g) => g.isActive !== false).map((g) => (
+                <button
+                  key={g.id}
+                  className={styles.groupCard}
+                  onClick={() => navigate(`/grupos/${g.id}`)}
+                >
+                  {g.bannerUrl ? (
+                    <div className={styles.groupBannerWrap}>
+                      <img src={g.bannerUrl} alt={g.name} className={styles.groupBanner} />
+                    </div>
+                  ) : (
+                    <div className={styles.groupBannerPlaceholder}>
+                      <span className={styles.groupEmoji}>{g.emoji || '🏆'}</span>
+                    </div>
+                  )}
+                  <div className={styles.groupCardFooter}>
                     <div className={styles.groupInfo}>
                       <span className={styles.groupName}>{g.name}</span>
                       <span className={styles.groupSub}>{daysRemaining(g.currentCycleEnd)} dias restantes</span>
                     </div>
                     <ChevronRight size={16} className={styles.groupChevron} />
-                  </button>
-                ))}
-              </Card>
+                  </div>
+                </button>
+              ))}
             </div>
           )}
 

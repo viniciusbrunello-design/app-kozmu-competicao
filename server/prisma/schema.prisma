@@ -62,6 +62,7 @@ model Group {
   cycleDuration     String   @default("weekly")
   maxMembers        Int      @default(20)
   isActive          Boolean  @default(true)
+  bannerUrl         String?
   rankingMode       String   @default("points")
   currentCycleStart DateTime @default(now())
   currentCycleEnd   DateTime

@@ -5,6 +5,7 @@ export interface Group {
   name: string;
   description?: string;
   emoji?: string;
+  bannerUrl?: string;
   inviteCode: string;
   type: string;
   cycleDuration: string;
@@ -109,9 +110,16 @@ export async function getGroupInviteCode(groupId: string): Promise<string> {
 
 export async function updateGroupSettings(
   groupId: string,
-  data: { rankingMode?: string; name?: string; description?: string },
+  data: { rankingMode?: string; name?: string; description?: string; bannerUrl?: string | null },
 ): Promise<void> {
   await api.put(`/groups/${groupId}/settings`, data);
+}
+
+export async function uploadGroupBanner(groupId: string, file: File): Promise<string> {
+  const form = new FormData();
+  form.append('banner', file);
+  const res = await api.upload<{ bannerUrl: string }>(`/groups/${groupId}/banner`, form);
+  return res.bannerUrl;
 }
 
 export async function updateGroupScoringRules(

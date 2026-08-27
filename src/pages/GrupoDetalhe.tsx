@@ -5,7 +5,7 @@ import { Avatar } from '../components/ui/Avatar';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
-import { getGroupDetails, getGroupRanking, getGroupActivity, updateGroupSettings, updateGroupScoringRules } from '../services/groups.service';
+import { getGroupDetails, getGroupRanking, getGroupActivity, updateGroupSettings, updateGroupScoringRules, uploadGroupBanner } from '../services/groups.service';
 import type { Group, RankingEntry, ActivityEntry } from '../services/groups.service';
 import { createSubmission } from '../services/submissions.service';
 import { api } from '../services/api';
@@ -125,6 +125,7 @@ export function GrupoDetalhe() {
   const [scoringRulesEdit, setScoringRulesEdit] = useState<Record<string, number>>({});
   const [settingsSaving, setSettingsSaving] = useState(false);
   const [settingsError, setSettingsError] = useState('');
+  const [bannerUploading, setBannerUploading] = useState(false);
 
   const load = useCallback(() => {
     if (!id) return;
@@ -225,6 +226,22 @@ export function GrupoDetalhe() {
       setSettingsError(err instanceof Error ? err.message : 'Erro ao salvar');
     } finally {
       setSettingsSaving(false);
+    }
+  }
+
+  async function handleBannerUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !id) return;
+    setBannerUploading(true);
+    setSettingsError('');
+    try {
+      const url = await uploadGroupBanner(id, file);
+      setGroup((prev) => prev ? { ...prev, bannerUrl: url } : prev);
+    } catch (err) {
+      setSettingsError(err instanceof Error ? err.message : 'Erro ao fazer upload');
+    } finally {
+      setBannerUploading(false);
+      e.target.value = '';
     }
   }
 
@@ -331,6 +348,12 @@ export function GrupoDetalhe() {
       </header>
 
       {copied && <div className={styles.copiedToast}>Código copiado!</div>}
+
+      {group!.bannerUrl && (
+        <div className={styles.bannerWrap}>
+          <img src={group!.bannerUrl} alt={group!.name} className={styles.bannerImg} />
+        </div>
+      )}
 
       <div className="page-content">
 
@@ -563,6 +586,23 @@ export function GrupoDetalhe() {
             </div>
 
             {settingsError && <div className={styles.ciError}>{settingsError}</div>}
+
+            <div className={styles.ciField}>
+              <label className={styles.ciLabel}>Banner do grupo</label>
+              {group?.bannerUrl && (
+                <img src={group.bannerUrl} alt="Banner atual" className={styles.bannerPreview} />
+              )}
+              <label className={`${styles.bannerUploadBtn} ${bannerUploading ? styles.bannerUploadBtnDisabled : ''}`}>
+                {bannerUploading ? 'Enviando...' : group?.bannerUrl ? 'Trocar banner' : 'Adicionar banner'}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  style={{ display: 'none' }}
+                  onChange={handleBannerUpload}
+                  disabled={bannerUploading}
+                />
+              </label>
+            </div>
 
             <div className={styles.ciField}>
               <label className={styles.ciLabel}>Modo de Ranking</label>
